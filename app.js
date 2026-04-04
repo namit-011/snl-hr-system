@@ -69,7 +69,7 @@ const Store = {
         bankAcc: '30120100013795', phone: '', email: '', status: 'active',
         salary: { basic: 18214, hra: 18214, prodIncentive: 1429, ot: 0, arrears: 0,
           epf: false, epfRate: 12, esi: false, esiRate: 0.75, tds: 0, advance: 0 },
-        leaveBalance: { CL: 12, SL: 12, EL: 15 }
+        leaveBalance: { CL: 12, SL: 12, EL: 15, CO: 0 }
       }],
       attendance: [],
       leaves: [],
@@ -86,6 +86,7 @@ const Store = {
         { id: 'SL',  name: 'Sick Leave',    annual: 12, paid: true,  color: '#10B981' },
         { id: 'EL',  name: 'Earned Leave',  annual: 15, paid: true,  color: '#8B5CF6' },
         { id: 'LOP', name: 'Loss of Pay',   annual: 0,  paid: false, color: '#EF4444' },
+        { id: 'CO',  name: 'Comp Off',      annual: 0,  paid: true,  color: '#F59E0B' },
       ]
     };
   },
@@ -665,6 +666,7 @@ const HR = {
     this._attDate = date;
     const activeEmps = this.data.employees.filter(e => e.status === 'active');
     const dayLabel   = new Date(date).toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    const isSunday   = new Date(date).getDay() === 0;
     const holiday    = this.data.holidays.find(h => h.date === date);
     // Existing records for this date
     const existing   = {};
@@ -678,10 +680,13 @@ const HR = {
           onchange="HR._attDate=this.value;HR.switchAttTab('mark')">
       </div>
       <div style="flex:1"></div>
-      <button class="btn btn-outline btn-sm" onclick="HR.markAllPresent()">✅ All Present</button>
+      ${!isSunday ? `<button class="btn btn-outline btn-sm" onclick="HR.markAllPresent()">✅ All Present</button>` : ''}
       <button class="btn btn-primary" onclick="HR.saveAttDay()">💾 Save Attendance</button>
     </div>
 
+    ${isSunday ? `<div class="alert alert-warning" style="font-weight:600">
+      🔵 Sunday — Weekly Off. Employees marked <strong>Present</strong> will earn +1 Comp Off leave.
+    </div>` : ''}
     ${holiday ? `<div class="alert alert-info">🎉 Public Holiday: <strong>${U.escHtml(holiday.name)}</strong></div>` : ''}
 
     <div class="card">
@@ -696,7 +701,9 @@ const HR = {
       </div>
       <div class="card-body" style="padding:0">
         <div class="alert alert-info" style="margin:12px 16px 0;font-size:12px">
-          Default is <strong>Present</strong> for all. Only mark exceptions (Leave / Half Day / Absent).
+          ${isSunday
+            ? 'Sunday — default is <strong>Week Off</strong>. Mark <strong>Present</strong> only if employee worked today (earns Comp Off).'
+            : 'Default is <strong>Present</strong> for all weekdays. Only mark exceptions (Leave / Half Day / Absent).'}
         </div>
         <div class="table-wrap">
           <table class="table">
@@ -704,7 +711,7 @@ const HR = {
               <tr>
                 <th>Employee</th>
                 <th>Leave Balance</th>
-                <th style="width:155px">Status</th>
+                <th style="width:165px">Status</th>
                 <th style="width:145px">Leave Type</th>
                 <th style="width:170px">Notes</th>
               </tr>
@@ -712,12 +719,13 @@ const HR = {
             <tbody>
               ${activeEmps.map(emp => {
                 const rec  = existing[emp.id];
-                const st   = rec?.status   || 'P';
+                const st   = rec?.status || (isSunday ? 'WO' : 'P');
                 const lt   = rec?.leaveType || 'CL';
                 const clBal = emp.leaveBalance?.CL ?? 0;
                 const slBal = emp.leaveBalance?.SL ?? 0;
                 const elBal = emp.leaveBalance?.EL ?? 0;
-                return `<tr>
+                const coBal = emp.leaveBalance?.CO ?? 0;
+                return `<tr style="${st==='P' && isSunday ? 'background:#FFFBEB' : ''}">
                   <td>
                     <strong>${U.escHtml(emp.name)}</strong>
                     <div class="text-muted text-sm">${emp.id} · ${U.escHtml(emp.designation)}</div>
@@ -725,15 +733,21 @@ const HR = {
                   <td>
                     <span class="badge badge-${clBal>0?'success':'danger'}" title="Casual Leave">CL:${clBal}</span>&nbsp;
                     <span class="badge badge-${slBal>0?'success':'danger'}" title="Sick Leave">SL:${slBal}</span>&nbsp;
-                    <span class="badge badge-${elBal>0?'success':'danger'}" title="Earned Leave">EL:${elBal}</span>
+                    <span class="badge badge-${elBal>0?'success':'danger'}" title="Earned Leave">EL:${elBal}</span>&nbsp;
+                    <span class="badge badge-warning" title="Comp Off">CO:${coBal}</span>
                   </td>
                   <td>
                     <select class="form-control" id="st-${emp.id}" style="font-size:12px;padding:5px 8px"
                       onchange="HR.onStatusChange('${emp.id}',this.value);HR.updateAttCounts()">
+                      ${isSunday ? `
+                      <option value="WO" ${st==='WO'?'selected':''}>🔵 Sunday Off</option>
+                      <option value="P"  ${st==='P' ?'selected':''}>✅ Present (Comp-off)</option>
+                      ` : `
                       <option value="P"  ${st==='P' ?'selected':''}>✅ Present</option>
                       <option value="L"  ${st==='L' ?'selected':''}>🏖 Leave</option>
                       <option value="HD" ${st==='HD'?'selected':''}>⏰ Half Day</option>
                       <option value="A"  ${st==='A' ?'selected':''}>❌ Absent / LOP</option>
+                      `}
                     </select>
                   </td>
                   <td>
@@ -832,11 +846,17 @@ const HR = {
       });
     });
 
-    // Deduct leave balance for approved paid leaves
+    const isSunday = new Date(date).getDay() === 0;
+
+    // Deduct leave balance for approved paid leaves; credit comp-off for Sunday work
     activeEmps.forEach(emp => {
       const rec = this.data.attendance.find(a => a.empId === emp.id && a.date === date);
-      if (rec?.status === 'L' && rec.leaveType && !rec.isLOP) {
-        if (!emp.leaveBalance) emp.leaveBalance = {};
+      if (!emp.leaveBalance) emp.leaveBalance = {};
+
+      if (isSunday && rec?.status === 'P') {
+        // Worked on Sunday → +1 Comp Off
+        emp.leaveBalance.CO = (emp.leaveBalance.CO || 0) + 1;
+      } else if (rec?.status === 'L' && rec.leaveType && !rec.isLOP) {
         emp.leaveBalance[rec.leaveType] = Math.max(0, (emp.leaveBalance[rec.leaveType] || 0) - 1);
       }
     });
@@ -861,9 +881,11 @@ const HR = {
         else if (r.status === 'A') cnt.A++;
       });
       const wd = this.calcWorkingDays(emp, ym);
-      const unmarkedDays = Math.max(0, wd - recs.length);
-      const paidDays = (cnt.P + unmarkedDays) + cnt.HD * 0.5 + cnt.L; // unmarked = present
-      return { emp, cnt, wd, paidDays };
+      const weekdayRecs = recs.filter(r => new Date(r.date).getDay() !== 0);
+      const sundayWorked = recs.filter(r => new Date(r.date).getDay() === 0 && r.status === 'P').length;
+      const unmarkedDays = Math.max(0, wd - weekdayRecs.length);
+      const paidDays = (cnt.P + unmarkedDays) + cnt.HD * 0.5 + cnt.L; // Sunday work = comp-off, not extra pay
+      return { emp, cnt, wd, paidDays, sundayWorked };
     });
 
     return `
@@ -880,7 +902,7 @@ const HR = {
       <div class="card-body" style="padding:0">
         <div class="table-wrap">
           <table class="table">
-            <thead><tr><th>Employee</th><th>Total Days</th><th>Present</th><th>Half Day</th><th>Leave</th><th>LOP / Absent</th><th>Paid Days</th></tr></thead>
+            <thead><tr><th>Employee</th><th>Working Days</th><th>Present</th><th>Half Day</th><th>Leave</th><th>LOP / Absent</th><th>Sunday Worked</th><th>Paid Days</th></tr></thead>
             <tbody>${summaries.map(s => `<tr>
               <td><strong>${U.escHtml(s.emp.name)}</strong><div class="text-muted text-sm">${s.emp.id}</div></td>
               <td>${s.wd}</td>
@@ -888,6 +910,7 @@ const HR = {
               <td><span class="badge badge-warning">${s.cnt.HD}</span></td>
               <td><span class="badge badge-info">${s.cnt.L}</span></td>
               <td>${(s.cnt.LOP + s.cnt.A) > 0 ? `<span class="badge badge-danger">${s.cnt.LOP + s.cnt.A}</span>` : '—'}</td>
+              <td>${s.sundayWorked > 0 ? `<span class="badge badge-warning">+${s.sundayWorked} CO</span>` : '—'}</td>
               <td><strong style="color:var(--primary)">${s.paidDays}</strong></td>
             </tr>`).join('')}</tbody>
           </table>
@@ -897,9 +920,14 @@ const HR = {
   },
 
   calcWorkingDays(emp, ym) {
-    // All calendar days in the month are working days
+    // All days except Sundays are working days
     const [y, m] = ym.split('-').map(Number);
-    return U.daysInMonth(y, m);
+    const total = U.daysInMonth(y, m);
+    let sundays = 0;
+    for (let d = 1; d <= total; d++) {
+      if (new Date(y, m - 1, d).getDay() === 0) sundays++;
+    }
+    return total - sundays;
   },
 
   exportAttCSV() {
@@ -922,7 +950,8 @@ const HR = {
       const cnt  = { P:0, L:0, HD:0, LOP:0 };
       recs.forEach(r => { if (r.isLOP) cnt.LOP++; else if (r.status==='P') cnt.P++; else if (r.status==='L') cnt.L++; else if (r.status==='HD') cnt.HD++; });
       const wd = this.calcWorkingDays(emp, ym);
-      const unmarked = Math.max(0, wd - recs.length);
+      const weekdayRecs3 = recs.filter(r => new Date(r.date).getDay() !== 0);
+      const unmarked = Math.max(0, wd - weekdayRecs3.length);
       rows.push([emp.id, emp.name, ...dayCols, cnt.P + unmarked, cnt.L, cnt.HD, cnt.LOP, (cnt.P+unmarked)+cnt.HD*0.5+cnt.L]);
     });
     const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
@@ -1308,8 +1337,9 @@ const HR = {
       else if (r.status === 'L') cntL++;
     });
 
-    // Days not in records = present by default (all days are working days)
-    const unmarkedPresentDays = Math.max(0, totalWorkingDays - recs.length);
+    // Only weekday records count toward unmarked calculation (Sundays are off by default)
+    const weekdayRecs = recs.filter(r => new Date(r.date).getDay() !== 0);
+    const unmarkedPresentDays = Math.max(0, totalWorkingDays - weekdayRecs.length);
     const effectivePresent    = cntP + unmarkedPresentDays;
     const paidDays   = effectivePresent + cntHD * 0.5 + cntL;
     const leavesAvailed = cntL;
@@ -1414,7 +1444,8 @@ const HR = {
       const recs = this.data.attendance.filter(a => a.empId === emp.id && a.date.startsWith(ym));
       let cntP = 0, cntHD = 0, cntL = 0, cntLOP = 0;
       recs.forEach(r => { if (r.isLOP||r.status==='A') cntLOP++; else if(r.status==='P') cntP++; else if(r.status==='HD') cntHD++; else if(r.status==='L') cntL++; });
-      const unmarked = Math.max(0, totalWorkingDays - recs.length);
+      const weekdayRecs2 = recs.filter(r => new Date(r.date).getDay() !== 0);
+      const unmarked = Math.max(0, totalWorkingDays - weekdayRecs2.length);
       const paidDays = (cntP+unmarked) + cntHD*0.5 + cntL;
       const lopDays  = cntLOP;
       const leaveBalance = (emp.leaveBalance?.CL||0)+(emp.leaveBalance?.SL||0)+(emp.leaveBalance?.EL||0);
