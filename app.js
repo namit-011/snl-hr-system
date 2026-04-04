@@ -60,7 +60,8 @@ const Store = {
     return {
       company: { name: 'SNL Innovations Pvt Ltd', address: '', phone: '', email: '' },
       adminUsers: [
-        { id: 'adm1', name: 'HR Admin', email: '', role: 'HR' }
+        { id: 'adm1', name: 'Namit Rawat', email: 'namit@innofarms.co.in', role: 'Admin' },
+        { id: 'adm2', name: 'HR',          email: 'hr@innofarms.co.in',    role: 'HR' }
       ],
       employees: [{
         id: '1017', name: 'Namit Rawat', grade: 'L-5', weekOff: 'Sat,Sun',
