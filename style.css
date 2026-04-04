@@ -631,8 +631,9 @@ strong { color: var(--gray-900); }
   display: flex; gap: 8px; margin: 16px 0;
 }
 .otp-digit {
-  flex: 1; text-align: center; font-size: 22px; font-weight: 700;
-  padding: 12px 0; border: 2px solid var(--gray-200); border-radius: var(--radius);
+  flex: 1; min-width: 0; width: 0;
+  text-align: center; font-size: 22px; font-weight: 700;
+  padding: 12px 4px; border: 2px solid var(--gray-200); border-radius: var(--radius);
   outline: none; color: var(--primary);
   transition: var(--transition);
 }
