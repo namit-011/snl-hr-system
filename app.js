@@ -839,25 +839,21 @@ const HR = {
         else if ((emp.leaveBalance?.[leaveType] || 0) <= 0) isLOP = true;
       }
 
-      // Save record (only non-trivially-Present entries + all L/A entries)
+      const isSundayOT = new Date(date).getDay() === 0 && status === 'P';
       this.data.attendance.push({
         empId: emp.id, date, status,
         leaveType: status === 'L' ? leaveType : '',
-        notes, isLOP
+        notes, isLOP,
+        isSundayOT,           // flagged for end-of-month resolution
+        sundayOTResolved: isSundayOT ? null : undefined  // null = pending
       });
     });
 
-    const isSunday = new Date(date).getDay() === 0;
-
-    // Deduct leave balance for approved paid leaves; credit comp-off for Sunday work
+    // Deduct leave balance for approved paid leaves (Sunday OT resolved separately at month-end)
     activeEmps.forEach(emp => {
       const rec = this.data.attendance.find(a => a.empId === emp.id && a.date === date);
       if (!emp.leaveBalance) emp.leaveBalance = {};
-
-      if (isSunday && rec?.status === 'P') {
-        // Worked on Sunday → +1 Comp Off
-        emp.leaveBalance.CO = (emp.leaveBalance.CO || 0) + 1;
-      } else if (rec?.status === 'L' && rec.leaveType && !rec.isLOP) {
+      if (rec?.status === 'L' && rec.leaveType && !rec.isLOP) {
         emp.leaveBalance[rec.leaveType] = Math.max(0, (emp.leaveBalance[rec.leaveType] || 0) - 1);
       }
     });
@@ -1277,12 +1273,13 @@ const HR = {
       </div>
       <div class="form-group" style="margin:0">
         <label>Month</label>
-        <input class="form-control" type="month" id="ps-month" value="${ym}" onchange="HR._psState.ym=this.value">
+        <input class="form-control" type="month" id="ps-month" value="${ym}" onchange="HR._psState.ym=this.value;document.getElementById('sunday-ot-section').innerHTML=HR.renderSundayOTSection(this.value)">
       </div>
       <button class="btn btn-primary" onclick="HR.generatePayslip()">⚡ Generate Payslip</button>
       <button class="btn btn-outline" onclick="HR.generateAllPayslips()">Generate All Employees</button>
       <button class="btn btn-success" onclick="HR.sendAllWhatsApp(document.getElementById('ps-month')?.value||HR._psState.ym)">📱 Send All via WhatsApp</button>
     </div>
+    <div id="sunday-ot-section">${this.renderSundayOTSection(ym)}</div>
     <div id="ps-preview"></div>
     <div class="card ps-history">
       <div class="card-head"><h3>Payslip History</h3></div>
@@ -1354,10 +1351,15 @@ const HR = {
     const basicEarned = lopDays > 0 ? Math.round((s.basic||0) * payRatio) : (s.basic||0);
     const hraEarned   = lopDays > 0 ? Math.round((s.hra||0)   * payRatio) : (s.hra||0);
 
+    // Sunday OT encashment for this month
+    const sundayOTDays = emp.pendingSundayOTEncash?.[ym] || 0;
+    const dailyRate    = totalWorkingDays > 0 ? Math.round(((s.basic||0) + (s.hra||0)) / totalWorkingDays) : 0;
+    const sundayOTAmt  = dailyRate * sundayOTDays;
+
     const earnings = {
       basic:         basicEarned,
       hra:           hraEarned,
-      ot:            0,
+      ot:            (s.ot || 0) + sundayOTAmt,   // merge Sunday OT encashment into OT line
       arrears:       s.arrears || 0,
       prodIncentive: s.prodIncentive || 0
     };
@@ -1369,9 +1371,15 @@ const HR = {
     const totalDed   = deductions.epf + deductions.esi + deductions.tds + deductions.advance;
     const net        = totalEarnings - totalDed;
 
+    // Clear the pending encashment after including in payslip
+    if (sundayOTDays > 0 && emp.pendingSundayOTEncash) {
+      delete emp.pendingSundayOTEncash[ym];
+    }
+
     const ps = {
       id: U.uid(), empId, ym,
       totalWorkingDays, paidDays, leavesAvailed, leaveBalance, lopDays,
+      sundayOTDays, sundayOTAmt,
       earnings, deductions, totalEarnings, totalDeductions: totalDed, net,
       generatedOn: U.today()
     };
@@ -1453,7 +1461,11 @@ const HR = {
       const payRatio = totalWorkingDays > 0 ? Math.min(1, paidDays/totalWorkingDays) : 1;
       const basicEarned = lopDays > 0 ? Math.round((s.basic||0)*payRatio) : (s.basic||0);
       const hraEarned   = lopDays > 0 ? Math.round((s.hra||0)*payRatio)   : (s.hra||0);
-      const earnings = { basic: basicEarned, hra: hraEarned, ot:0, arrears: s.arrears||0, prodIncentive: s.prodIncentive||0 };
+      const sundayOTDays2 = emp.pendingSundayOTEncash?.[ym] || 0;
+      const dailyRate2    = totalWorkingDays > 0 ? Math.round(((s.basic||0)+(s.hra||0))/totalWorkingDays) : 0;
+      const sundayOTAmt2  = dailyRate2 * sundayOTDays2;
+      if (sundayOTDays2 > 0 && emp.pendingSundayOTEncash) delete emp.pendingSundayOTEncash[ym];
+      const earnings = { basic: basicEarned, hra: hraEarned, ot:(s.ot||0)+sundayOTAmt2, arrears: s.arrears||0, prodIncentive: s.prodIncentive||0 };
       const totalEarnings = Object.values(earnings).reduce((a,b)=>a+b,0);
       const epfAmt = s.epf ? Math.round(basicEarned*(s.epfRate||12)/100) : 0;
       const esiAmt = s.esi ? Math.round(totalEarnings*(s.esiRate||0.75)/100) : 0;
@@ -1910,6 +1922,109 @@ const HR = {
     document.getElementById('holiday-list').innerHTML = this.holidayItems();
     this.toast('Deleted','info');
   },
+  // ── SUNDAY OT RESOLUTION ────────────────────────────────────
+  renderSundayOTSection(ym) {
+    ym = ym || this._psState.ym || U.currentYM();
+    const activeEmps = this.data.employees.filter(e => e.status === 'active');
+
+    // Gather unresolved Sunday OT records per employee for this month
+    const pending = [];
+    activeEmps.forEach(emp => {
+      const sunRecs = this.data.attendance.filter(a =>
+        a.empId === emp.id && a.isSundayOT && a.date.startsWith(ym) && a.sundayOTResolved === null
+      );
+      if (sunRecs.length > 0) {
+        const s = emp.salary || {};
+        const wd = this.calcWorkingDays(emp, ym);
+        const dailyRate = wd > 0 ? Math.round(((s.basic||0) + (s.hra||0)) / wd) : 0;
+        const encashAmt = dailyRate * sunRecs.length;
+        pending.push({ emp, sunRecs, dailyRate, encashAmt });
+      }
+    });
+
+    if (pending.length === 0) return '';
+
+    return `
+    <div class="card" style="border:2px solid var(--warning);margin-bottom:16px">
+      <div class="card-head" style="background:var(--warning-light)">
+        <h3 style="color:#92400E">☀ Sunday OT — Pending Resolution (${U.fmtMonthYear(ym)})</h3>
+        <div style="font-size:12px;color:#92400E">${pending.length} employee(s) worked on Sundays this month</div>
+      </div>
+      <div class="card-body" style="padding:0">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Sundays Worked</th>
+              <th>Daily Rate</th>
+              <th>Encash Amount</th>
+              <th>Resolution</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${pending.map(p => `<tr>
+              <td>
+                <strong>${U.escHtml(p.emp.name)}</strong>
+                <div class="text-muted text-sm">${p.emp.id}</div>
+              </td>
+              <td>
+                ${p.sunRecs.map(r => `<span class="badge badge-warning">${U.fmtDate(r.date)}</span>`).join(' ')}
+              </td>
+              <td>₹${U.fmtINR(p.dailyRate)}/day</td>
+              <td><strong>₹${U.fmtINR(p.encashAmt)}</strong></td>
+              <td style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-success btn-sm"
+                  onclick="HR.resolveSundayOT('${p.emp.id}','${ym}','encash')">
+                  💰 Encash ₹${U.fmtINR(p.encashAmt)}
+                </button>
+                <button class="btn btn-primary btn-sm"
+                  onclick="HR.resolveSundayOT('${p.emp.id}','${ym}','leave')">
+                  📅 Add ${p.sunRecs.length} Comp Off
+                </button>
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+        <div style="padding:10px 16px;font-size:11px;color:var(--gray-400)">
+          Encash: extra pay added to next payslip earnings. Add Leave: credited to Comp Off balance.
+        </div>
+      </div>
+    </div>`;
+  },
+
+  resolveSundayOT(empId, ym, type) {
+    const emp = this.data.employees.find(e => e.id === empId);
+    if (!emp) return;
+
+    const sunRecs = this.data.attendance.filter(a =>
+      a.empId === empId && a.isSundayOT && a.date.startsWith(ym) && a.sundayOTResolved === null
+    );
+    if (!sunRecs.length) return;
+
+    const count = sunRecs.length;
+    sunRecs.forEach(r => { r.sundayOTResolved = type; });
+
+    if (!emp.leaveBalance) emp.leaveBalance = {};
+
+    if (type === 'leave') {
+      emp.leaveBalance.CO = (emp.leaveBalance.CO || 0) + count;
+      this.toast(`+${count} Comp Off added to ${emp.name}'s leave balance`);
+    } else {
+      // Encash: store pending encashment; picked up during payslip generation
+      if (!emp.pendingSundayOTEncash) emp.pendingSundayOTEncash = {};
+      emp.pendingSundayOTEncash[ym] = (emp.pendingSundayOTEncash[ym] || 0) + count;
+      const s = emp.salary || {};
+      const wd = this.calcWorkingDays(emp, ym);
+      const dailyRate = wd > 0 ? Math.round(((s.basic||0) + (s.hra||0)) / wd) : 0;
+      this.toast(`₹${U.fmtINR(dailyRate * count)} Sunday OT encashment recorded for ${emp.name} — will appear in payslip`);
+    }
+
+    this.save();
+    // Refresh the section
+    const el = document.getElementById('sunday-ot-section');
+    if (el) el.innerHTML = this.renderSundayOTSection(ym);
+  },
+
   adminUserRows() {
     return (this.data.adminUsers || []).map(u => `<tr>
       <td><strong>${U.escHtml(u.name)}</strong></td>
