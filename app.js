@@ -108,22 +108,22 @@ const Store = {
 // AUTH (OTP LOGIN)
 // ============================================================
 const Auth = {
-  _otp: null,
-  _otpExpiry: null,
   _phone: null,
   _timerInterval: null,
-  SESSION_KEY: 'hr_snl_auth',
+  SESSION_KEY: 'hr_snl_token',
 
-  isLoggedIn() {
+  async isLoggedIn() {
+    const token = sessionStorage.getItem(this.SESSION_KEY);
+    if (!token) return false;
     try {
-      const s = JSON.parse(sessionStorage.getItem(this.SESSION_KEY) || 'null');
-      return !!(s && s.exp > Date.now());
+      const res  = await fetch('/api/verify-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+      const data = await res.json();
+      return data.valid === true;
     } catch { return false; }
-  },
-
-  currentUser() {
-    try { return JSON.parse(sessionStorage.getItem(this.SESSION_KEY) || 'null'); }
-    catch { return null; }
   },
 
   showLogin() {
@@ -156,7 +156,7 @@ const Auth = {
     this._showStep(1);
   },
 
-  sendOTP() {
+  async sendOTP() {
     const phoneInput = document.getElementById('login-phone-input');
     const phone = phoneInput.value.replace(/\D/g,'');
     if (phone.length !== 10) {
@@ -166,51 +166,57 @@ const Auth = {
     }
     phoneInput.style.borderColor = '';
 
-    const otp = String(Math.floor(100000 + Math.random() * 900000));
-    this._otp = otp;
-    this._phone = phone;
-    this._otpExpiry = Date.now() + 5 * 60 * 1000;
+    const btn = document.querySelector('#login-step1 .btn-primary');
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
 
+    try {
+      const res  = await fetch('/api/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone })
+      });
+      const data = await res.json();
+      if (!data.success) {
+        btn.disabled = false;
+        btn.textContent = 'Send OTP via SMS →';
+        this._showError(data.error || 'Could not send OTP');
+        return;
+      }
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Send OTP via SMS →';
+      this._showError('Network error — is the server running?');
+      return;
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Send OTP via SMS →';
+
+    this._phone = phone;
     const boxes = document.getElementById('otp-boxes');
     boxes.innerHTML = [0,1,2,3,4,5].map(i =>
       `<input class="otp-digit" id="otp-d${i}" maxlength="1" type="text" inputmode="numeric"
         oninput="Auth._otpInput(this,${i})" onkeydown="Auth._otpKey(event,${i})">`
     ).join('');
 
-    document.getElementById('login-phone-display').textContent = '+91 ' + phone.replace(/(\d{5})(\d{5})/,'$1 $2');
+    document.getElementById('login-phone-display').textContent =
+      '+91 ' + phone.replace(/(\d{5})(\d{5})/, '$1 $2');
     this._showStep(2);
-    this._startTimer();
+    this._startTimer(5 * 60);
     setTimeout(() => document.getElementById('otp-d0')?.focus(), 100);
-
-    // Try backend SMS first, fall back to WhatsApp
-    this._deliverOTP(phone, otp);
   },
 
-  async _deliverOTP(phone, otp) {
-    const displayEl = document.getElementById('login-phone-display');
-    try {
-      const res = await fetch('/api/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, otp })
-      });
-      const data = await res.json();
-      if (data.success) {
-        displayEl.innerHTML = `+91 ${phone.replace(/(\d{5})(\d{5})/,'$1 $2')}
-          <span style="color:var(--success);font-size:12px;display:block;margin-top:2px">
-            ✓ OTP sent via SMS
-          </span>`;
-        return;
-      }
-    } catch (_) { /* backend not available or failed — fall through */ }
-
-    // Fallback: open WhatsApp
-    const waMsg = `Your OTP for SNL Innovations HR System is: *${otp}*\n\nDo not share this code.\nValid for 5 minutes.`;
-    window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(waMsg)}`, '_blank');
-    displayEl.innerHTML = `+91 ${phone.replace(/(\d{5})(\d{5})/,'$1 $2')}
-      <span style="color:var(--info);font-size:12px;display:block;margin-top:2px">
-        OTP sent via WhatsApp
-      </span>`;
+  _showError(msg) {
+    let el = document.getElementById('login-error');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'login-error';
+      el.style.cssText = 'color:var(--danger);font-size:12px;margin-top:8px;text-align:center';
+      document.getElementById('login-step1').appendChild(el);
+    }
+    el.textContent = msg;
+    setTimeout(() => { if (el) el.textContent = ''; }, 5000);
   },
 
   _otpInput(el, idx) {
@@ -226,59 +232,78 @@ const Auth = {
     if (e.key === 'Enter') this.verifyOTP();
   },
 
-  _startTimer() {
+  _startTimer(seconds) {
     clearInterval(this._timerInterval);
+    let rem = seconds;
     const timerEl = document.getElementById('otp-timer');
     const update = () => {
-      const rem = Math.max(0, Math.ceil((this._otpExpiry - Date.now()) / 1000));
       const m = Math.floor(rem/60), s = rem % 60;
       timerEl.innerHTML = rem > 0
         ? `OTP expires in <strong>${m}:${String(s).padStart(2,'0')}</strong>`
-        : `<strong style="color:var(--danger)">OTP expired. Go back and try again.</strong>`;
-      if (rem === 0) clearInterval(this._timerInterval);
+        : `<strong style="color:var(--danger)">OTP expired. Go back and request a new one.</strong>`;
+      if (rem-- <= 0) clearInterval(this._timerInterval);
     };
     update();
     this._timerInterval = setInterval(update, 1000);
   },
 
-  verifyOTP() {
+  async verifyOTP() {
     const entered = [0,1,2,3,4,5].map(i =>
       document.getElementById(`otp-d${i}`)?.value || ''
     ).join('');
     if (entered.length < 6) return;
-    if (Date.now() > this._otpExpiry) {
-      alert('OTP has expired. Go back and request a new one.'); return;
-    }
-    if (entered !== this._otp) {
-      [0,1,2,3,4,5].forEach(i => {
-        const el = document.getElementById(`otp-d${i}`);
-        if (el) { el.value = ''; el.style.borderColor = 'var(--danger)'; }
+
+    const btn = document.querySelector('#login-step2 .btn-primary');
+    btn.disabled = true;
+    btn.textContent = 'Verifying…';
+
+    try {
+      const res  = await fetch('/api/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: this._phone, otp: entered })
       });
-      document.getElementById('otp-d0')?.focus();
-      return;
+      const data = await res.json();
+
+      if (!data.success) {
+        btn.disabled = false;
+        btn.textContent = 'Verify & Login';
+        [0,1,2,3,4,5].forEach(i => {
+          const el = document.getElementById(`otp-d${i}`);
+          if (el) { el.value = ''; el.style.borderColor = 'var(--danger)'; }
+        });
+        document.getElementById('otp-d0')?.focus();
+        const rem = data.attemptsLeft != null ? ` (${data.attemptsLeft} attempts left)` : '';
+        document.getElementById('otp-timer').innerHTML =
+          `<span style="color:var(--danger)">${data.error}${rem}</span>`;
+        return;
+      }
+
+      // Success
+      clearInterval(this._timerInterval);
+      sessionStorage.setItem(this.SESSION_KEY, data.token);
+
+      const hrData = Store.load();
+      const adminUser = (hrData.adminUsers || []).find(u =>
+        (u.phone||'').replace(/\D/g,'') === this._phone
+      );
+      const userName = adminUser?.name || 'Admin';
+      const userRole = adminUser?.role || 'HR';
+
+      document.getElementById('login-screen').classList.add('hidden');
+      HR._onLoginSuccess(userName, userRole);
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Verify & Login';
+      document.getElementById('otp-timer').innerHTML =
+        `<span style="color:var(--danger)">Network error — try again</span>`;
     }
-
-    clearInterval(this._timerInterval);
-    const data = Store.load();
-    const adminUser = (data.adminUsers || []).find(u =>
-      (u.phone||'').replace(/\D/g,'') === this._phone
-    );
-    const userName = adminUser?.name || 'Admin';
-    const userRole = adminUser?.role || 'HR';
-
-    sessionStorage.setItem(this.SESSION_KEY, JSON.stringify({
-      phone: this._phone, name: userName, role: userRole,
-      exp: Date.now() + 8 * 60 * 60 * 1000
-    }));
-
-    document.getElementById('login-screen').classList.add('hidden');
-    HR._onLoginSuccess(userName, userRole);
   },
 
   logout() {
     if (!confirm('Logout from HR System?')) return;
     sessionStorage.removeItem(this.SESSION_KEY);
-    this._otp = null; this._phone = null;
+    this._phone = null;
     clearInterval(this._timerInterval);
     document.getElementById('btn-logout').style.display = 'none';
     document.getElementById('header-user-badge').style.display = 'none';
@@ -294,14 +319,27 @@ const HR = {
   page: 'dashboard',
 
   // ── INIT ──────────────────────────────────────────────────
-  init() {
+  async init() {
     this.data = Store.load();
-    if (!Auth.isLoggedIn()) {
+    const loggedIn = await Auth.isLoggedIn();
+    if (!loggedIn) {
       Auth.showLogin();
       return;
     }
-    const u = Auth.currentUser();
-    this._onLoginSuccess(u?.name || 'Admin', u?.role || 'HR');
+    // Re-resolve name/role from stored token phone
+    const token = sessionStorage.getItem(Auth.SESSION_KEY);
+    let userName = 'Admin', userRole = 'HR';
+    if (token) {
+      try {
+        const { payload } = JSON.parse(atob(token));
+        const phone = payload.split(':')[0];
+        const adminUser = (this.data.adminUsers || []).find(u =>
+          (u.phone||'').replace(/\D/g,'') === phone
+        );
+        if (adminUser) { userName = adminUser.name; userRole = adminUser.role; }
+      } catch {}
+    }
+    this._onLoginSuccess(userName, userRole);
   },
 
   _onLoginSuccess(userName, userRole) {
