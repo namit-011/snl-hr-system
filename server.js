@@ -44,7 +44,12 @@ app.post('/api/send-otp', async (req, res) => {
     const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
       method: 'POST',
       headers: { 'authorization': apiKey, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ variables_values: otp, route: 'otp', numbers: phone })
+      body: JSON.stringify({
+        message: `Your SNL Innovations HR login OTP is: ${otp}. Valid for 5 minutes. Do not share.`,
+        language: 'english',
+        route: 'q',
+        numbers: phone
+      })
     });
     const data = await response.json();
     if (data.return !== true) throw new Error(data.message || JSON.stringify(data));
