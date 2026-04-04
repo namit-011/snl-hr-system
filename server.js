@@ -1,8 +1,7 @@
 'use strict';
-const express    = require('express');
-const crypto     = require('crypto');
-const nodemailer = require('nodemailer');
-const path       = require('path');
+const express = require('express');
+const crypto  = require('crypto');
+const path    = require('path');
 
 const app = express();
 app.use(express.json());
@@ -17,17 +16,6 @@ function hashOTP(otp) {
   return crypto.createHash('sha256').update(String(otp)).digest('hex');
 }
 
-// ── Email transport (Gmail) ────────────────────────────────────
-function getTransport() {
-  const user = process.env.GMAIL_USER;
-  const pass = process.env.GMAIL_APP_PASSWORD;
-  if (!user || !pass) return null;
-  return nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user, pass }
-  });
-}
-
 // ── POST /api/send-otp ─────────────────────────────────────────
 app.post('/api/send-otp', async (req, res) => {
   const { email } = req.body || {};
@@ -35,11 +23,11 @@ app.post('/api/send-otp', async (req, res) => {
     return res.status(400).json({ success: false, error: 'Invalid email address' });
   }
 
-  const transport = getTransport();
-  if (!transport) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
     return res.status(503).json({
       success: false,
-      error: 'Email not configured. Set GMAIL_USER and GMAIL_APP_PASSWORD in Railway variables.'
+      error: 'Email not configured. Add RESEND_API_KEY in Railway environment variables.'
     });
   }
 
@@ -50,26 +38,34 @@ app.post('/api/send-otp', async (req, res) => {
   }
 
   const otp = String(Math.floor(100000 + Math.random() * 900000));
+  const otpHtml = `
+    <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;border:1px solid #e2e8f0;border-radius:12px">
+      <h2 style="color:#4F46E5;margin-bottom:8px">SNL Innovations HR System</h2>
+      <p style="color:#64748b;margin-bottom:24px">Your one-time login password:</p>
+      <div style="font-size:40px;font-weight:800;letter-spacing:12px;color:#0F172A;text-align:center;
+                  background:#EEF2FF;padding:20px;border-radius:8px;margin-bottom:24px">${otp}</div>
+      <p style="color:#64748b;font-size:13px">Valid for <strong>5 minutes</strong>. Do not share this code with anyone.</p>
+      <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0">
+      <p style="color:#94a3b8;font-size:11px">If you didn't request this, ignore this email.</p>
+    </div>`;
 
   try {
-    await transport.sendMail({
-      from: `"SNL Innovations HR" <${process.env.GMAIL_USER}>`,
-      to: email,
-      subject: 'Your HR System Login OTP',
-      html: `
-        <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;border:1px solid #e2e8f0;border-radius:12px">
-          <h2 style="color:#4F46E5;margin-bottom:8px">SNL Innovations HR System</h2>
-          <p style="color:#64748b;margin-bottom:24px">Your one-time login password:</p>
-          <div style="font-size:40px;font-weight:800;letter-spacing:12px;color:#0F172A;text-align:center;
-                      background:#EEF2FF;padding:20px;border-radius:8px;margin-bottom:24px">
-            ${otp}
-          </div>
-          <p style="color:#64748b;font-size:13px">Valid for <strong>5 minutes</strong>. Do not share this code with anyone.</p>
-          <hr style="border:none;border-top:1px solid #e2e8f0;margin:20px 0">
-          <p style="color:#94a3b8;font-size:11px">If you didn't request this, ignore this email.</p>
-        </div>
-      `
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'SNL Innovations HR <onboarding@resend.dev>',
+        to: [email],
+        subject: 'Your HR System Login OTP',
+        html: otpHtml
+      })
     });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || JSON.stringify(data));
 
     otpStore.set(email, {
       hash: hashOTP(otp),
@@ -81,7 +77,7 @@ app.post('/api/send-otp', async (req, res) => {
     console.log(`OTP dispatched to ${email}`);
     return res.json({ success: true });
   } catch (err) {
-    console.error('Email error:', err.message);
+    console.error('Resend error:', err.message);
     return res.status(502).json({ success: false, error: 'Failed to send email: ' + err.message });
   }
 });
