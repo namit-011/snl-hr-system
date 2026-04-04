@@ -60,7 +60,7 @@ const Store = {
     return {
       company: { name: 'SNL Innovations Pvt Ltd', address: '', phone: '', email: '' },
       adminUsers: [
-        { id: 'adm1', name: 'HR Admin', phone: '7976404460', role: 'HR' }
+        { id: 'adm1', name: 'HR Admin', email: '', role: 'HR' }
       ],
       employees: [{
         id: '1017', name: 'Namit Rawat', grade: 'L-5', weekOff: 'Sat,Sun',
@@ -108,7 +108,7 @@ const Store = {
 // AUTH (OTP LOGIN)
 // ============================================================
 const Auth = {
-  _phone: null,
+  _email: null,
   _timerInterval: null,
   SESSION_KEY: 'hr_snl_token',
 
@@ -136,12 +136,12 @@ const Auth = {
     sel.innerHTML = '<option value="">— Choose your name —</option>';
     (data.adminUsers || []).forEach(u => {
       const opt = document.createElement('option');
-      opt.value = (u.phone || '').replace(/\D/g,'');
+      opt.value = u.email || '';
       opt.textContent = `${u.name} (${u.role})`;
       sel.appendChild(opt);
     });
     sel.onchange = () => {
-      if (sel.value) document.getElementById('login-phone-input').value = sel.value;
+      if (sel.value) document.getElementById('login-email-input').value = sel.value;
     };
     this._showStep(1);
   },
@@ -157,14 +157,14 @@ const Auth = {
   },
 
   async sendOTP() {
-    const phoneInput = document.getElementById('login-phone-input');
-    const phone = phoneInput.value.replace(/\D/g,'');
-    if (phone.length !== 10) {
-      phoneInput.style.borderColor = 'var(--danger)';
-      phoneInput.placeholder = 'Enter a valid 10-digit number';
+    const emailInput = document.getElementById('login-email-input');
+    const email = (emailInput.value || '').trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      emailInput.style.borderColor = 'var(--danger)';
+      emailInput.placeholder = 'Enter a valid email address';
       return;
     }
-    phoneInput.style.borderColor = '';
+    emailInput.style.borderColor = '';
 
     const btn = document.querySelector('#login-step1 .btn-primary');
     btn.disabled = true;
@@ -174,34 +174,33 @@ const Auth = {
       const res  = await fetch('/api/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone })
+        body: JSON.stringify({ email })
       });
       const data = await res.json();
       if (!data.success) {
         btn.disabled = false;
-        btn.textContent = 'Send OTP via SMS →';
+        btn.textContent = 'Send OTP via Email →';
         this._showError(data.error || 'Could not send OTP');
         return;
       }
     } catch (err) {
       btn.disabled = false;
-      btn.textContent = 'Send OTP via SMS →';
+      btn.textContent = 'Send OTP via Email →';
       this._showError('Network error — is the server running?');
       return;
     }
 
     btn.disabled = false;
-    btn.textContent = 'Send OTP via SMS →';
+    btn.textContent = 'Send OTP via Email →';
 
-    this._phone = phone;
+    this._email = email;
     const boxes = document.getElementById('otp-boxes');
     boxes.innerHTML = [0,1,2,3,4,5].map(i =>
       `<input class="otp-digit" id="otp-d${i}" maxlength="1" type="text" inputmode="numeric"
         oninput="Auth._otpInput(this,${i})" onkeydown="Auth._otpKey(event,${i})">`
     ).join('');
 
-    document.getElementById('login-phone-display').textContent =
-      '+91 ' + phone.replace(/(\d{5})(\d{5})/, '$1 $2');
+    document.getElementById('login-phone-display').textContent = email;
     this._showStep(2);
     this._startTimer(5 * 60);
     setTimeout(() => document.getElementById('otp-d0')?.focus(), 100);
@@ -261,7 +260,7 @@ const Auth = {
       const res  = await fetch('/api/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: this._phone, otp: entered })
+        body: JSON.stringify({ email: this._email, otp: entered })
       });
       const data = await res.json();
 
@@ -285,7 +284,7 @@ const Auth = {
 
       const hrData = Store.load();
       const adminUser = (hrData.adminUsers || []).find(u =>
-        (u.phone||'').replace(/\D/g,'') === this._phone
+        (u.email||'').toLowerCase() === this._email.toLowerCase()
       );
       const userName = adminUser?.name || 'Admin';
       const userRole = adminUser?.role || 'HR';
@@ -303,7 +302,7 @@ const Auth = {
   logout() {
     if (!confirm('Logout from HR System?')) return;
     sessionStorage.removeItem(this.SESSION_KEY);
-    this._phone = null;
+    this._email = null;
     clearInterval(this._timerInterval);
     document.getElementById('btn-logout').style.display = 'none';
     document.getElementById('header-user-badge').style.display = 'none';
@@ -332,9 +331,9 @@ const HR = {
     if (token) {
       try {
         const { payload } = JSON.parse(atob(token));
-        const phone = payload.split(':')[0];
+        const email = payload.slice(0, payload.lastIndexOf(':'));
         const adminUser = (this.data.adminUsers || []).find(u =>
-          (u.phone||'').replace(/\D/g,'') === phone
+          (u.email||'').toLowerCase() === email.toLowerCase()
         );
         if (adminUser) { userName = adminUser.name; userRole = adminUser.role; }
       } catch {}
@@ -1787,12 +1786,12 @@ const HR = {
         </div>
         <div class="card-body" style="padding:0">
           <table class="table">
-            <thead><tr><th>Name</th><th>Role</th><th>WhatsApp No.</th><th></th></tr></thead>
+            <thead><tr><th>Name</th><th>Role</th><th>Email</th><th></th></tr></thead>
             <tbody id="admin-users-tbody">${this.adminUserRows()}</tbody>
           </table>
         </div>
         <div style="padding:10px 16px;font-size:11px;color:var(--gray-400)">
-          OTP will be sent to the WhatsApp number of the selected user at login.
+          OTP will be sent to the email address of the selected user at login.
         </div>
       </div>
 
@@ -1905,7 +1904,7 @@ const HR = {
     return (this.data.adminUsers || []).map(u => `<tr>
       <td><strong>${U.escHtml(u.name)}</strong></td>
       <td><span class="badge badge-info">${U.escHtml(u.role)}</span></td>
-      <td>${u.phone ? '+91 ' + U.escHtml(u.phone) : '<span class="text-muted">Not set</span>'}</td>
+      <td>${u.email ? U.escHtml(u.email) : '<span class="text-muted">Not set</span>'}</td>
       <td>
         <button class="btn btn-outline btn-sm" onclick="HR.openAdminUserForm('${u.id}')">Edit</button>
         <button class="btn btn-danger btn-sm" onclick="HR.deleteAdminUser('${u.id}')">Del</button>
@@ -1927,9 +1926,9 @@ const HR = {
             <option value="Admin"${u?.role==='Admin'?' selected':''}>Admin</option>
             <option value="Management"${u?.role==='Management'?' selected':''}>Management</option>
           </select></div>
-        <div class="form-group"><label>WhatsApp Number (10 digits)</label>
-          <input class="form-control" name="phone" type="tel" maxlength="10"
-            value="${U.escHtml(u?.phone||'')}" placeholder="e.g. 9876543210"></div>
+        <div class="form-group"><label>Email Address (for OTP login)</label>
+          <input class="form-control" name="email" type="email"
+            value="${U.escHtml(u?.email||'')}" placeholder="e.g. hr@snlinnovations.com" required></div>
       </div>
       <div class="form-actions">
         <button type="button" class="btn btn-outline" onclick="HR.closeModal()">Cancel</button>
@@ -1941,13 +1940,13 @@ const HR = {
   saveAdminUser(e, id) {
     e.preventDefault();
     const fd = new FormData(e.target);
-    const phone = (fd.get('phone')||'').replace(/\D/g,'');
+    const email = (fd.get('email')||'').trim().toLowerCase();
     if (!this.data.adminUsers) this.data.adminUsers = [];
     if (id) {
       const u = this.data.adminUsers.find(x => x.id === id);
-      if (u) { u.name = fd.get('name'); u.role = fd.get('role'); u.phone = phone; }
+      if (u) { u.name = fd.get('name'); u.role = fd.get('role'); u.email = email; }
     } else {
-      this.data.adminUsers.push({ id: U.uid(), name: fd.get('name'), role: fd.get('role'), phone });
+      this.data.adminUsers.push({ id: U.uid(), name: fd.get('name'), role: fd.get('role'), email });
     }
     this.save(); this.closeModal();
     document.getElementById('admin-users-tbody').innerHTML = this.adminUserRows();
