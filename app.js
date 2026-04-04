@@ -408,7 +408,7 @@ const HR = {
     const active  = this.data.employees.filter(e => e.status === 'active');
     const todayRecs = this.data.attendance.filter(a => a.date === today);
     const markedIds = new Set(todayRecs.map(a => a.empId));
-    const present   = todayRecs.filter(a => ['P','HD','WO'].includes(a.status)).length
+    const present   = todayRecs.filter(a => ['P','HD'].includes(a.status)).length
                     + active.filter(e => !markedIds.has(e.id)).length; // unmarked = present
     const onLeave   = todayRecs.filter(a => a.status === 'L').length;
     const absent    = todayRecs.filter(a => a.status === 'A').length;
@@ -435,8 +435,8 @@ const HR = {
               const rec = todayRecs.find(a => a.empId === e.id);
               const st  = rec?.status || 'P';
               const lt  = rec?.leaveType ? this.data.leaveTypes.find(t => t.id === rec.leaveType)?.name || rec.leaveType : '—';
-              const stLabel = {P:'Present',HD:'Half Day',L:'Leave',A:'Absent',WO:'Week Off'};
-              const stBadge = {P:'success',HD:'warning',L:'info',A:'danger',WO:'gray'};
+              const stLabel = {P:'Present',HD:'Half Day',L:'Leave',A:'Absent'};
+              const stBadge = {P:'success',HD:'warning',L:'info',A:'danger'};
               return `<tr>
                 <td><strong>${U.escHtml(e.name)}</strong><div class="text-muted text-sm">${e.id}</div></td>
                 <td><span class="badge badge-${stBadge[st]||'success'}">${stLabel[st]||st}</span></td>
@@ -712,7 +712,7 @@ const HR = {
             <tbody>
               ${activeEmps.map(emp => {
                 const rec  = existing[emp.id];
-                const st   = rec?.status   || (this.isWeekOff(emp, date) ? 'WO' : 'P');
+                const st   = rec?.status   || 'P';
                 const lt   = rec?.leaveType || 'CL';
                 const clBal = emp.leaveBalance?.CL ?? 0;
                 const slBal = emp.leaveBalance?.SL ?? 0;
@@ -734,7 +734,6 @@ const HR = {
                       <option value="L"  ${st==='L' ?'selected':''}>🏖 Leave</option>
                       <option value="HD" ${st==='HD'?'selected':''}>⏰ Half Day</option>
                       <option value="A"  ${st==='A' ?'selected':''}>❌ Absent / LOP</option>
-                      <option value="WO" ${st==='WO'?'selected':''}>🔵 Week Off</option>
                     </select>
                   </td>
                   <td>
@@ -792,7 +791,7 @@ const HR = {
     let p = 0, l = 0, hd = 0, a = 0;
     this.data.employees.filter(e => e.status === 'active').forEach(emp => {
       const v = document.getElementById(`st-${emp.id}`)?.value || 'P';
-      if (v === 'P' || v === 'WO') p++;
+      if (v === 'P') p++;
       else if (v === 'L') l++;
       else if (v === 'HD') hd++;
       else if (v === 'A') a++;
@@ -853,17 +852,16 @@ const HR = {
 
     const summaries = activeEmps.map(emp => {
       const recs = this.data.attendance.filter(a => a.empId === emp.id && a.date.startsWith(ym));
-      const cnt = { P:0, HD:0, L:0, A:0, WO:0, LOP:0 };
+      const cnt = { P:0, HD:0, L:0, A:0, LOP:0 };
       recs.forEach(r => {
         if (r.isLOP) cnt.LOP++;
         else if (r.status === 'P') cnt.P++;
         else if (r.status === 'HD') cnt.HD++;
         else if (r.status === 'L') cnt.L++;
         else if (r.status === 'A') cnt.A++;
-        else if (r.status === 'WO') cnt.WO++;
       });
       const wd = this.calcWorkingDays(emp, ym);
-      const unmarkedDays = Math.max(0, wd - recs.filter(r => r.status !== 'WO').length);
+      const unmarkedDays = Math.max(0, wd - recs.length);
       const paidDays = (cnt.P + unmarkedDays) + cnt.HD * 0.5 + cnt.L; // unmarked = present
       return { emp, cnt, wd, paidDays };
     });
@@ -882,7 +880,7 @@ const HR = {
       <div class="card-body" style="padding:0">
         <div class="table-wrap">
           <table class="table">
-            <thead><tr><th>Employee</th><th>Working Days</th><th>Present</th><th>Half Day</th><th>Leave</th><th>LOP / Absent</th><th>Week Off</th><th>Paid Days</th></tr></thead>
+            <thead><tr><th>Employee</th><th>Total Days</th><th>Present</th><th>Half Day</th><th>Leave</th><th>LOP / Absent</th><th>Paid Days</th></tr></thead>
             <tbody>${summaries.map(s => `<tr>
               <td><strong>${U.escHtml(s.emp.name)}</strong><div class="text-muted text-sm">${s.emp.id}</div></td>
               <td>${s.wd}</td>
@@ -890,7 +888,6 @@ const HR = {
               <td><span class="badge badge-warning">${s.cnt.HD}</span></td>
               <td><span class="badge badge-info">${s.cnt.L}</span></td>
               <td>${(s.cnt.LOP + s.cnt.A) > 0 ? `<span class="badge badge-danger">${s.cnt.LOP + s.cnt.A}</span>` : '—'}</td>
-              <td><span class="badge badge-gray">${s.cnt.WO}</span></td>
               <td><strong style="color:var(--primary)">${s.paidDays}</strong></td>
             </tr>`).join('')}</tbody>
           </table>
@@ -900,17 +897,9 @@ const HR = {
   },
 
   calcWorkingDays(emp, ym) {
+    // All calendar days in the month are working days
     const [y, m] = ym.split('-').map(Number);
-    const days = U.daysInMonth(y, m);
-    const woDays  = (emp.weekOff||'').split(',').map(s => s.trim().toLowerCase());
-    const holDates = new Set(this.data.holidays.filter(h => h.date.startsWith(ym)).map(h => h.date));
-    let count = 0;
-    for (let d = 1; d <= days; d++) {
-      const ds = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      const dn = new Date(ds).toLocaleDateString('en-IN', { weekday:'long' }).toLowerCase();
-      if (!woDays.some(w => w && dn.includes(w.slice(0,3))) && !holDates.has(ds)) count++;
-    }
-    return count;
+    return U.daysInMonth(y, m);
   },
 
   exportAttCSV() {
@@ -933,7 +922,7 @@ const HR = {
       const cnt  = { P:0, L:0, HD:0, LOP:0 };
       recs.forEach(r => { if (r.isLOP) cnt.LOP++; else if (r.status==='P') cnt.P++; else if (r.status==='L') cnt.L++; else if (r.status==='HD') cnt.HD++; });
       const wd = this.calcWorkingDays(emp, ym);
-      const unmarked = Math.max(0, wd - recs.filter(r=>r.status!=='WO').length);
+      const unmarked = Math.max(0, wd - recs.length);
       rows.push([emp.id, emp.name, ...dayCols, cnt.P + unmarked, cnt.L, cnt.HD, cnt.LOP, (cnt.P+unmarked)+cnt.HD*0.5+cnt.L]);
     });
     const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
@@ -1035,21 +1024,11 @@ const HR = {
 
     const empId = fd.get('empId');
     const emp = this.data.employees.find(x => x.id === empId);
-    const weekOffDays = (emp?.weekOff||'').split(',').map(s => s.trim().toLowerCase());
-    const holDates = new Set(this.data.holidays.map(h => h.date));
 
-    // Count working days in the range (exclude weekoffs & holidays)
-    let days = 0;
-    let cur = new Date(from);
-    const end = new Date(to);
-    while (cur <= end) {
-      const dateStr = cur.toISOString().split('T')[0];
-      const dayName = cur.toLocaleDateString('en-IN', { weekday:'long' }).toLowerCase();
-      const isWO = weekOffDays.some(w => w && dayName.includes(w.slice(0,3)));
-      if (!isWO && !holDates.has(dateStr)) days++;
-      cur.setDate(cur.getDate() + 1);
-    }
-    if (days === 0) return this.toast('No working days in selected range', 'error');
+    // Count all calendar days in the range (all days are working days)
+    const msPerDay = 86400000;
+    const days = Math.round((new Date(to) - new Date(from)) / msPerDay) + 1;
+    if (days <= 0) return this.toast('Invalid date range', 'error');
 
     const typeId    = fd.get('type');
     const status    = fd.get('status') || 'approved';
@@ -1321,17 +1300,16 @@ const HR = {
     const recs = this.data.attendance.filter(a => a.empId === empId && a.date.startsWith(ym));
 
     // Count statuses
-    let cntP = 0, cntHD = 0, cntL = 0, cntLOP = 0, cntWO = 0;
+    let cntP = 0, cntHD = 0, cntL = 0, cntLOP = 0;
     recs.forEach(r => {
       if (r.isLOP || r.status === 'A') cntLOP++;
       else if (r.status === 'P') cntP++;
       else if (r.status === 'HD') cntHD++;
       else if (r.status === 'L') cntL++;
-      else if (r.status === 'WO') cntWO++;
     });
 
-    // Days not in records = marked present by default
-    const unmarkedPresentDays = Math.max(0, totalWorkingDays - recs.filter(r => r.status !== 'WO').length);
+    // Days not in records = present by default (all days are working days)
+    const unmarkedPresentDays = Math.max(0, totalWorkingDays - recs.length);
     const effectivePresent    = cntP + unmarkedPresentDays;
     const paidDays   = effectivePresent + cntHD * 0.5 + cntL;
     const leavesAvailed = cntL;
@@ -1436,7 +1414,7 @@ const HR = {
       const recs = this.data.attendance.filter(a => a.empId === emp.id && a.date.startsWith(ym));
       let cntP = 0, cntHD = 0, cntL = 0, cntLOP = 0;
       recs.forEach(r => { if (r.isLOP||r.status==='A') cntLOP++; else if(r.status==='P') cntP++; else if(r.status==='HD') cntHD++; else if(r.status==='L') cntL++; });
-      const unmarked = Math.max(0, totalWorkingDays - recs.filter(r=>r.status!=='WO').length);
+      const unmarked = Math.max(0, totalWorkingDays - recs.length);
       const paidDays = (cntP+unmarked) + cntHD*0.5 + cntL;
       const lopDays  = cntLOP;
       const leaveBalance = (emp.leaveBalance?.CL||0)+(emp.leaveBalance?.SL||0)+(emp.leaveBalance?.EL||0);
