@@ -107,25 +107,36 @@ const DEFAULT_ADMIN_USERS = [
   { id: 'adm1', name: 'Namit Rawat',     email: 'namit@innofarms.co.in',      role: 'Admin',      password: 'Snl@1234' },
   { id: 'adm2', name: 'Akhil Bhaskar',   email: 'akhil@innofarms.co.in',      role: 'HR',         password: 'Snl@1234' },
   { id: 'adm3', name: 'Saurabh Gupta',   email: 'saurabh@innofarms.co.in',    role: 'CBO',        password: 'Snl@1234' },
-  { id: 'adm4', name: 'Chandresh Modi',  email: 'chandresh@innofarms.co.in',  role: 'Accounts',   password: 'Snl@1234' },
   { id: 'adm5', name: 'Liza Gupta',      email: 'liza@innofarms.co.in',       role: 'COO',        password: 'Snl@1234' },
   { id: 'adm6', name: 'Sudhanshu Gupta', email: 'sudhanshu@innofarms.co.in',  role: 'CEO',        password: 'Snl@1234' },
   { id: 'adm7', name: 'Astha Oberoi',    email: 'astha@innofarms.co.in',      role: 'Management', password: 'Snl@1234' },
   { id: 'adm8', name: 'Accounts',        email: 'accounts@innofarms.co.in',   role: 'Accounts',   password: 'Snl@1234' },
 ];
 
-// ── Patch: ensure required admin users exist in MongoDB ───────
+// ── Patch: sync admin users in MongoDB with current config ────
 async function patchAdminUsers() {
   try {
     const dbData = await loadData();
     if (!dbData || !dbData.adminUsers) return;
 
+    let changed = false;
+
+    // Remove deleted users
+    const removeEmails = ['chandresh@innofarms.co.in'];
+    const before = dbData.adminUsers.length;
+    dbData.adminUsers = dbData.adminUsers.filter(u =>
+      !removeEmails.includes((u.email || '').toLowerCase())
+    );
+    if (dbData.adminUsers.length !== before) {
+      changed = true;
+      console.log('Removed stale admin users');
+    }
+
+    // Add missing users
     const required = [
       { id: 'adm7', name: 'Astha Oberoi', email: 'astha@innofarms.co.in',    role: 'Management', password: 'Snl@1234' },
       { id: 'adm8', name: 'Accounts',     email: 'accounts@innofarms.co.in', role: 'Accounts',   password: 'Snl@1234' },
     ];
-
-    let changed = false;
     for (const user of required) {
       const exists = dbData.adminUsers.find(u =>
         (u.email || '').toLowerCase() === user.email.toLowerCase()

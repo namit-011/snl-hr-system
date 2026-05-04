@@ -63,7 +63,6 @@ const Store = {
         { id: 'adm1', name: 'Namit Rawat',     email: 'namit@innofarms.co.in',      role: 'Admin',      password: 'Snl@1234' },
         { id: 'adm2', name: 'Akhil Bhaskar',   email: 'akhil@innofarms.co.in',      role: 'HR',         password: 'Snl@1234' },
         { id: 'adm3', name: 'Saurabh Gupta',   email: 'saurabh@innofarms.co.in',    role: 'CBO',        password: 'Snl@1234' },
-        { id: 'adm4', name: 'Chandresh Modi',  email: 'chandresh@innofarms.co.in',  role: 'Accounts',   password: 'Snl@1234' },
         { id: 'adm5', name: 'Liza Gupta',      email: 'liza@innofarms.co.in',       role: 'COO',        password: 'Snl@1234' },
         { id: 'adm6', name: 'Sudhanshu Gupta', email: 'sudhanshu@innofarms.co.in',  role: 'CEO',        password: 'Snl@1234' },
         { id: 'adm7', name: 'Astha Oberoi',    email: 'astha@innofarms.co.in',      role: 'Management', password: 'Snl@1234' },
@@ -187,28 +186,9 @@ const Auth = {
     } catch { return false; }
   },
 
-  async showLogin() {
-    // Load only the admin user list for the dropdown (no auth needed for names)
-    let adminUsers = [];
-    try {
-      const res = await fetch('/api/hr-data', {
-        headers: { 'Authorization': 'Bearer ' + (sessionStorage.getItem(this.SESSION_KEY) || '') }
-      });
-      if (res.ok) {
-        const d = await res.json();
-        adminUsers = d.data?.adminUsers || [];
-      }
-    } catch { /* fall through to defaults */ }
-    if (!adminUsers.length) {
-      adminUsers = [
-        { name: 'Namit Rawat',     email: 'namit@innofarms.co.in',      role: 'Admin' },
-        { name: 'Akhil Bhaskar',   email: 'akhil@innofarms.co.in',      role: 'HR' },
-        { name: 'Saurabh Gupta',   email: 'saurabh@innofarms.co.in',    role: 'CBO' },
-        { name: 'Chandresh Modi',  email: 'chandresh@innofarms.co.in',  role: 'Accounts' },
-        { name: 'Liza Gupta',      email: 'liza@innofarms.co.in',       role: 'COO' },
-        { name: 'Sudhanshu Gupta', email: 'sudhanshu@innofarms.co.in',  role: 'CEO' },
-      ];
-    }
+  showLogin() {
+    // Use local defaults — no API call needed before login
+    const adminUsers = Store.defaults().adminUsers;
 
     document.getElementById('login-screen').classList.remove('hidden');
 
@@ -1813,7 +1793,26 @@ const HR = {
   },
 
   // ── PDF GENERATION ───────────────────────────────────────
+  async _loadPDFLibs() {
+    if (window.html2canvas && window.jspdf) return;
+    await Promise.all([
+      new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+        s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      }),
+      new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+        s.onload = res; s.onerror = rej;
+        document.head.appendChild(s);
+      })
+    ]);
+  },
+
   async generatePDF(psId) {
+    await this._loadPDFLibs();
     const ps  = this.data.payslips.find(p => p.id === psId);
     const emp = ps ? this.data.employees.find(e => e.id === ps.empId) : null;
     if (!ps || !emp) { this.toast('Payslip not found','error'); return null; }
