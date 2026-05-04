@@ -366,7 +366,7 @@ const HR = {
 
   // ── ROLE HELPERS ──────────────────────────────────────────
   canSeeSalary() {
-    return ['HR', 'Accounts'].includes(this.currentUser?.role);
+    return this.currentUser?.role === 'Accounts';
   },
   isHRAdmin() {
     return ['HR', 'Admin'].includes(this.currentUser?.role);
@@ -403,7 +403,7 @@ const HR = {
   },
   _updateNavVisibility() {
     const role = this.currentUser?.role;
-    const salaryOk   = ['HR', 'Accounts'].includes(role);
+    const salaryOk   = role === 'Accounts';
     const settingsOk = ['HR', 'Admin', 'Accounts'].includes(role);
     document.querySelectorAll('.nav-link').forEach(el => {
       const page = el.dataset.page;
@@ -441,7 +441,7 @@ const HR = {
   // ── NAVIGATION ────────────────────────────────────────────
   nav(page) {
     if ((page === 'salary' || page === 'payslip') && !this.canSeeSalary()) {
-      this.toast('Access denied — Salary data is restricted to HR and Accounts only', 'error');
+      this.toast('Access denied — Salary data is restricted to Accounts only', 'error');
       return;
     }
     if (page === 'settings' && !['HR', 'Admin', 'Accounts'].includes(this.currentUser?.role)) {
