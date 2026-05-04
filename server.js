@@ -19,14 +19,14 @@ dns.setServers(['8.8.8.8', '1.1.1.1']);
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/snl_hr';
 
 mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 15000 })
-  .then(() => {
+  .then(async () => {
     console.log('MongoDB connected');
-    migrateFromFileIfNeeded();
+    await migrateFromFileIfNeeded();
+    await patchAdminUsers();
   })
   .catch(err => {
     console.error('MongoDB connection failed:', err.message);
     console.error('Check your MONGO_URI and Network Access whitelist in Atlas');
-    // Keep server running so it can retry; mongoose retries automatically
   });
 
 // One document holds all HR data for the company
@@ -104,13 +104,44 @@ function authenticate(req, res, next) {
 
 // ── Default admin users (server-side fallback) ────────────────
 const DEFAULT_ADMIN_USERS = [
-  { id: 'adm1', name: 'Namit Rawat',     email: 'namit@innofarms.co.in',      role: 'Admin',    password: 'Snl@1234' },
-  { id: 'adm2', name: 'Akhil Bhaskar',   email: 'akhil@innofarms.co.in',      role: 'HR',       password: 'Snl@1234' },
-  { id: 'adm3', name: 'Saurabh Gupta',   email: 'saurabh@innofarms.co.in',    role: 'CBO',      password: 'Snl@1234' },
-  { id: 'adm4', name: 'Chandresh Modi',  email: 'chandresh@innofarms.co.in',  role: 'Accounts', password: 'Snl@1234' },
-  { id: 'adm5', name: 'Liza Gupta',      email: 'liza@innofarms.co.in',       role: 'COO',      password: 'Snl@1234' },
-  { id: 'adm6', name: 'Sudhanshu Gupta', email: 'sudhanshu@innofarms.co.in',  role: 'CEO',      password: 'Snl@1234' },
+  { id: 'adm1', name: 'Namit Rawat',     email: 'namit@innofarms.co.in',      role: 'Admin',      password: 'Snl@1234' },
+  { id: 'adm2', name: 'Akhil Bhaskar',   email: 'akhil@innofarms.co.in',      role: 'HR',         password: 'Snl@1234' },
+  { id: 'adm3', name: 'Saurabh Gupta',   email: 'saurabh@innofarms.co.in',    role: 'CBO',        password: 'Snl@1234' },
+  { id: 'adm4', name: 'Chandresh Modi',  email: 'chandresh@innofarms.co.in',  role: 'Accounts',   password: 'Snl@1234' },
+  { id: 'adm5', name: 'Liza Gupta',      email: 'liza@innofarms.co.in',       role: 'COO',        password: 'Snl@1234' },
+  { id: 'adm6', name: 'Sudhanshu Gupta', email: 'sudhanshu@innofarms.co.in',  role: 'CEO',        password: 'Snl@1234' },
+  { id: 'adm7', name: 'Astha Oberoi',    email: 'astha@innofarms.co.in',      role: 'Management', password: 'Snl@1234' },
+  { id: 'adm8', name: 'Accounts',        email: 'accounts@innofarms.co.in',   role: 'Accounts',   password: 'Snl@1234' },
 ];
+
+// ── Patch: ensure required admin users exist in MongoDB ───────
+async function patchAdminUsers() {
+  try {
+    const dbData = await loadData();
+    if (!dbData || !dbData.adminUsers) return;
+
+    const required = [
+      { id: 'adm7', name: 'Astha Oberoi', email: 'astha@innofarms.co.in',    role: 'Management', password: 'Snl@1234' },
+      { id: 'adm8', name: 'Accounts',     email: 'accounts@innofarms.co.in', role: 'Accounts',   password: 'Snl@1234' },
+    ];
+
+    let changed = false;
+    for (const user of required) {
+      const exists = dbData.adminUsers.find(u =>
+        (u.email || '').toLowerCase() === user.email.toLowerCase()
+      );
+      if (!exists) {
+        dbData.adminUsers.push(user);
+        changed = true;
+        console.log(`Added admin user: ${user.name} (${user.email})`);
+      }
+    }
+
+    if (changed) await saveData(dbData);
+  } catch (err) {
+    console.error('patchAdminUsers error:', err.message);
+  }
+}
 
 // ── POST /api/login ────────────────────────────────────────────
 app.post('/api/login', async (req, res) => {

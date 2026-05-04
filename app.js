@@ -60,12 +60,14 @@ const Store = {
     return {
       company: { name: 'SNL Innovations Pvt Ltd', address: '', phone: '', email: '' },
       adminUsers: [
-        { id: 'adm1', name: 'Namit Rawat',     email: 'namit@innofarms.co.in',      role: 'Admin',    password: 'Snl@1234' },
-        { id: 'adm2', name: 'Akhil Bhaskar',   email: 'akhil@innofarms.co.in',      role: 'HR',       password: 'Snl@1234' },
-        { id: 'adm3', name: 'Saurabh Gupta',   email: 'saurabh@innofarms.co.in',    role: 'CBO',      password: 'Snl@1234' },
-        { id: 'adm4', name: 'Chandresh Modi',  email: 'chandresh@innofarms.co.in',  role: 'Accounts', password: 'Snl@1234' },
-        { id: 'adm5', name: 'Liza Gupta',      email: 'liza@innofarms.co.in',       role: 'COO',      password: 'Snl@1234' },
-        { id: 'adm6', name: 'Sudhanshu Gupta', email: 'sudhanshu@innofarms.co.in',  role: 'CEO',      password: 'Snl@1234' }
+        { id: 'adm1', name: 'Namit Rawat',     email: 'namit@innofarms.co.in',      role: 'Admin',      password: 'Snl@1234' },
+        { id: 'adm2', name: 'Akhil Bhaskar',   email: 'akhil@innofarms.co.in',      role: 'HR',         password: 'Snl@1234' },
+        { id: 'adm3', name: 'Saurabh Gupta',   email: 'saurabh@innofarms.co.in',    role: 'CBO',        password: 'Snl@1234' },
+        { id: 'adm4', name: 'Chandresh Modi',  email: 'chandresh@innofarms.co.in',  role: 'Accounts',   password: 'Snl@1234' },
+        { id: 'adm5', name: 'Liza Gupta',      email: 'liza@innofarms.co.in',       role: 'COO',        password: 'Snl@1234' },
+        { id: 'adm6', name: 'Sudhanshu Gupta', email: 'sudhanshu@innofarms.co.in',  role: 'CEO',        password: 'Snl@1234' },
+        { id: 'adm7', name: 'Astha Oberoi',    email: 'astha@innofarms.co.in',      role: 'Management', password: 'Snl@1234' },
+        { id: 'adm8', name: 'Accounts',        email: 'accounts@innofarms.co.in',   role: 'Accounts',   password: 'Snl@1234' },
       ],
       employees: [
         // ── LEADERSHIP ─────────────────────────────────────────────
