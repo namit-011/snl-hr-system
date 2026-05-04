@@ -60,18 +60,49 @@ const Store = {
     return {
       company: { name: 'SNL Innovations Pvt Ltd', address: '', phone: '', email: '' },
       adminUsers: [
-        { id: 'adm1', name: 'Namit Rawat', email: 'namit@innofarms.co.in', role: 'Admin' },
-        { id: 'adm2', name: 'HR',          email: 'hr@innofarms.co.in',    role: 'HR' }
+        { id: 'adm1', name: 'Namit Rawat',     email: 'namit@innofarms.co.in',      role: 'Admin',    password: 'Snl@1234' },
+        { id: 'adm2', name: 'Akhil Bhaskar',   email: 'akhil@innofarms.co.in',      role: 'HR',       password: 'Snl@1234' },
+        { id: 'adm3', name: 'Saurabh Gupta',   email: 'saurabh@innofarms.co.in',    role: 'CBO',      password: 'Snl@1234' },
+        { id: 'adm4', name: 'Chandresh Modi',  email: 'chandresh@innofarms.co.in',  role: 'Accounts', password: 'Snl@1234' },
+        { id: 'adm5', name: 'Liza Gupta',      email: 'liza@innofarms.co.in',       role: 'COO',      password: 'Snl@1234' },
+        { id: 'adm6', name: 'Sudhanshu Gupta', email: 'sudhanshu@innofarms.co.in',  role: 'CEO',      password: 'Snl@1234' }
       ],
-      employees: [{
-        id: '1017', name: 'Namit Rawat', grade: 'L-5', weekOff: 'Sat,Sun',
-        designation: "Founder's Office", department: 'Sales & Marketing',
-        doj: '2024-05-20', bankName: 'BOB', ifsc: 'BARB0JAWJAI',
-        bankAcc: '30120100013795', phone: '', email: '', status: 'active',
-        salary: { basic: 18214, hra: 18214, prodIncentive: 1429, ot: 0, arrears: 0,
-          epf: false, epfRate: 12, esi: false, esiRate: 0.75, tds: 0, advance: 0 },
-        leaveBalance: { CL: 12, SL: 12, EL: 15, CO: 0 }
-      }],
+      employees: [
+        // ── LEADERSHIP ─────────────────────────────────────────────
+        { id:'1001', name:'Sudhanshu Gupta',     doj:'2018-02-02', designation:'CEO',        department:'Executive',          weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'sudhanshu@innofarms.co.in', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,CO:0} },
+        { id:'1002', name:'Liza Gupta',           doj:'2018-02-02', designation:'COO',        department:'Operations',         weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'liza@innofarms.co.in',       status:'active', managerId:'adm6', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,CO:0} },
+        { id:'1022', name:'Saurabh Gupta',        doj:'',           designation:'CBO',        department:'Business Operations',weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'saurabh@innofarms.co.in',    status:'active', managerId:'adm6', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,CO:0} },
+        // ── EMPLOYEES (by code order) ──────────────────────────────
+        { id:'1003', name:'Gopal Kumar',          doj:'2020-11-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:2,  CO:0} },
+        { id:'1004', name:'Krishan Gopal',        doj:'2020-11-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:6,  CO:0} },
+        { id:'1005', name:'Ashim Nath',           doj:'2021-07-09', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:4.5,CO:0} },
+        { id:'1006', name:'Asaram',               doj:'',           designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1007', name:'Dharmveer',            doj:'',           designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1008', name:'Gopal Singh',          doj:'2018-02-02', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1009', name:'Jainarayan',           doj:'',           designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:3,  CO:0} },
+        { id:'1010', name:'Brijendra Singh',      doj:'2021-07-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1011', name:'Rajesh Kumar Meena',   doj:'2023-02-13', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:2.5,CO:0} },
+        { id:'1012', name:'Talib',                doj:'2023-08-17', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1013', name:'Manoj Meena',          doj:'2023-07-21', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1014', name:'Sandeep',              doj:'2020-05-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1017', name:'Namit Rawat',          doj:'2024-05-20', designation:"Founder's Office", department:'Sales & Marketing', weekOff:'Sat,Sun', grade:'L-5', bankName:'BOB', ifsc:'BARB0JAWJAI', bankAcc:'30120100013795', phone:'', email:'', status:'active', managerId:'adm3', salary:{basic:18214,hra:18214,prodIncentive:1429,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1018', name:'Abhinav Gupta',        doj:'2024-06-15', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'adm3', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1021', name:'Ramesh Prajapati',     doj:'2024-12-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:6,  CO:0} },
+        { id:'1026', name:'Dashrath Choudhary',   doj:'2025-04-21', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1027', name:'Dinesh Dagur',         doj:'2025-04-28', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1029', name:'Om Prakash Dhoboi',    doj:'2025-06-08', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1032', name:'Manraj Bairwa',        doj:'2025-06-12', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1034', name:'Vimal Mahawar',        doj:'2025-07-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1035', name:'Keshav',               doj:'2025-07-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1038', name:'Pravej Khan',          doj:'2025-07-17', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:1.5,CO:0} },
+        { id:'1039', name:'Chandresh Modi',       doj:'2025-07-17', designation:'Accountant', department:'Accounts & Finance', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'chandresh@innofarms.co.in', status:'active', managerId:'adm6', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1041', name:'Kailash Chand Nogya',  doj:'2025-08-19', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1044', name:'Astha Oberoi',         doj:'2025-10-08', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1045', name:'Bhanu Pratap',         doj:'2025-10-13', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1046', name:'Akhil Bhaskar',        doj:'2026-01-01', designation:'HR Manager', department:'Human Resources', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'akhil@innofarms.co.in', status:'active', managerId:'adm6', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1047', name:'Tarun Agarwal',        doj:'2026-02-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1049', name:'Priyanshi Jain',       doj:'2026-03-16', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+      ],
       attendance: [],
       leaves: [],
       payslips: [],
@@ -83,23 +114,51 @@ const Store = {
         { date: '2026-12-25', name: 'Christmas' },
       ],
       leaveTypes: [
-        { id: 'CL',  name: 'Casual Leave',  annual: 12, paid: true,  color: '#3B82F6' },
-        { id: 'SL',  name: 'Sick Leave',    annual: 12, paid: true,  color: '#10B981' },
-        { id: 'EL',  name: 'Earned Leave',  annual: 15, paid: true,  color: '#8B5CF6' },
+        { id: 'CL',  name: 'Casual Leave',  annual: 7,  paid: true,  color: '#3B82F6' },
+        { id: 'SL',  name: 'Sick Leave',    annual: 6,  paid: true,  color: '#10B981' },
+        { id: 'EL',  name: 'Earned Leave',  annual: 18, paid: true,  color: '#8B5CF6', tenureBased: true },
         { id: 'LOP', name: 'Loss of Pay',   annual: 0,  paid: false, color: '#EF4444' },
         { id: 'CO',  name: 'Comp Off',      annual: 0,  paid: true,  color: '#F59E0B' },
       ]
     };
   },
-  load() {
+  async load() {
     try {
-      const s = localStorage.getItem(this.KEY);
-      if (s) return { ...this.defaults(), ...JSON.parse(s) };
-    } catch(e) {}
+      const token = sessionStorage.getItem('hr_snl_token');
+      if (token) {
+        const res = await fetch('/api/hr-data', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await res.json();
+        if (result.success) {
+          // Merge with defaults to ensure any new fields are present
+          return { ...this.defaults(), ...result.data };
+        }
+      }
+    } catch(e) {
+      console.error('Store Load Error:', e);
+    }
     return this.defaults();
   },
-  save(d) {
-    try { localStorage.setItem(this.KEY, JSON.stringify(d)); } catch(e) {}
+  async save(d) {
+    try {
+      const token = sessionStorage.getItem('hr_snl_token');
+      if (!token) return false;
+      
+      const res = await fetch('/api/hr-data', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ data: d })
+      });
+      const result = await res.json();
+      return result.success;
+    } catch(e) {
+      console.error('Store Save Error:', e);
+      return false;
+    }
   }
 };
 
@@ -107,11 +166,9 @@ const Store = {
 // MAIN APP
 // ============================================================
 // ============================================================
-// AUTH (OTP LOGIN)
+// AUTH (PASSWORD LOGIN)
 // ============================================================
 const Auth = {
-  _email: null,
-  _timerInterval: null,
   SESSION_KEY: 'hr_snl_token',
 
   async isLoggedIn() {
@@ -128,15 +185,34 @@ const Auth = {
     } catch { return false; }
   },
 
-  showLogin() {
-    const data = Store.load();
+  async showLogin() {
+    // Load only the admin user list for the dropdown (no auth needed for names)
+    let adminUsers = [];
+    try {
+      const res = await fetch('/api/hr-data', {
+        headers: { 'Authorization': 'Bearer ' + (sessionStorage.getItem(this.SESSION_KEY) || '') }
+      });
+      if (res.ok) {
+        const d = await res.json();
+        adminUsers = d.data?.adminUsers || [];
+      }
+    } catch { /* fall through to defaults */ }
+    if (!adminUsers.length) {
+      adminUsers = [
+        { name: 'Namit Rawat',     email: 'namit@innofarms.co.in',      role: 'Admin' },
+        { name: 'Akhil Bhaskar',   email: 'akhil@innofarms.co.in',      role: 'HR' },
+        { name: 'Saurabh Gupta',   email: 'saurabh@innofarms.co.in',    role: 'CBO' },
+        { name: 'Chandresh Modi',  email: 'chandresh@innofarms.co.in',  role: 'Accounts' },
+        { name: 'Liza Gupta',      email: 'liza@innofarms.co.in',       role: 'COO' },
+        { name: 'Sudhanshu Gupta', email: 'sudhanshu@innofarms.co.in',  role: 'CEO' },
+      ];
+    }
+
     document.getElementById('login-screen').classList.remove('hidden');
-    document.getElementById('login-company-name').textContent =
-      data.company.name || 'SNL Innovations';
 
     const sel = document.getElementById('login-user-select');
     sel.innerHTML = '<option value="">— Choose your name —</option>';
-    (data.adminUsers || []).forEach(u => {
+    adminUsers.forEach(u => {
       const opt = document.createElement('option');
       opt.value = u.email || '';
       opt.textContent = `${u.name} (${u.role})`;
@@ -145,167 +221,79 @@ const Auth = {
     sel.onchange = () => {
       if (sel.value) document.getElementById('login-email-input').value = sel.value;
     };
-    this._showStep(1);
+
+    document.getElementById('login-email-input').value = '';
+    document.getElementById('login-password-input').value = '';
+    this._showError('');
   },
 
-  _showStep(n) {
-    document.getElementById('login-step1').classList.toggle('active', n === 1);
-    document.getElementById('login-step2').classList.toggle('active', n === 2);
-  },
+  async login() {
+    const emailInput    = document.getElementById('login-email-input');
+    const passwordInput = document.getElementById('login-password-input');
+    const email    = (emailInput.value || '').trim();
+    const password = (passwordInput.value || '');
 
-  backToStep1() {
-    clearInterval(this._timerInterval);
-    this._showStep(1);
-  },
+    emailInput.style.borderColor    = '';
+    passwordInput.style.borderColor = '';
 
-  async sendOTP() {
-    const emailInput = document.getElementById('login-email-input');
-    const email = (emailInput.value || '').trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       emailInput.style.borderColor = 'var(--danger)';
-      emailInput.placeholder = 'Enter a valid email address';
+      this._showError('Enter a valid email address');
+      emailInput.focus();
       return;
     }
-    emailInput.style.borderColor = '';
+    if (!password) {
+      passwordInput.style.borderColor = 'var(--danger)';
+      this._showError('Enter your password');
+      passwordInput.focus();
+      return;
+    }
 
-    const btn = document.querySelector('#login-step1 .btn-primary');
+    const btn = document.getElementById('login-btn');
     btn.disabled = true;
-    btn.textContent = 'Sending…';
+    btn.textContent = 'Signing in…';
 
     try {
-      const res  = await fetch('/api/send-otp', {
+      const res  = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, password })
       });
       const data = await res.json();
+
       if (!data.success) {
         btn.disabled = false;
-        btn.textContent = 'Send OTP via Email →';
-        this._showError(data.error || 'Could not send OTP');
+        btn.textContent = 'Login →';
+        passwordInput.value = '';
+        passwordInput.style.borderColor = 'var(--danger)';
+        this._showError(data.error || 'Login failed. Check your email and password.');
+        passwordInput.focus();
         return;
       }
+
+      sessionStorage.setItem(this.SESSION_KEY, data.token);
+      document.getElementById('login-screen').classList.add('hidden');
+      btn.disabled = false;
+      btn.textContent = 'Login →';
+
+      const hrData = await Store.load();
+      HR.data = hrData;
+      HR._onLoginSuccess(data.name, data.role, data.email);
     } catch (err) {
       btn.disabled = false;
-      btn.textContent = 'Send OTP via Email →';
+      btn.textContent = 'Login →';
       this._showError('Network error — is the server running?');
-      return;
     }
-
-    btn.disabled = false;
-    btn.textContent = 'Send OTP via Email →';
-
-    this._email = email;
-    const boxes = document.getElementById('otp-boxes');
-    boxes.innerHTML = [0,1,2,3,4,5].map(i =>
-      `<input class="otp-digit" id="otp-d${i}" maxlength="1" type="text" inputmode="numeric"
-        oninput="Auth._otpInput(this,${i})" onkeydown="Auth._otpKey(event,${i})">`
-    ).join('');
-
-    document.getElementById('login-phone-display').textContent = email;
-    this._showStep(2);
-    this._startTimer(5 * 60);
-    setTimeout(() => document.getElementById('otp-d0')?.focus(), 100);
   },
 
   _showError(msg) {
-    let el = document.getElementById('login-error');
-    if (!el) {
-      el = document.createElement('div');
-      el.id = 'login-error';
-      el.style.cssText = 'color:var(--danger);font-size:12px;margin-top:8px;text-align:center';
-      document.getElementById('login-step1').appendChild(el);
-    }
-    el.textContent = msg;
-    setTimeout(() => { if (el) el.textContent = ''; }, 5000);
-  },
-
-  _otpInput(el, idx) {
-    el.value = el.value.replace(/\D/g,'').slice(-1);
-    el.style.borderColor = '';
-    if (el.value && idx < 5) document.getElementById(`otp-d${idx+1}`)?.focus();
-    if (idx === 5 && el.value) this.verifyOTP();
-  },
-
-  _otpKey(e, idx) {
-    if (e.key === 'Backspace' && !e.target.value && idx > 0)
-      document.getElementById(`otp-d${idx-1}`)?.focus();
-    if (e.key === 'Enter') this.verifyOTP();
-  },
-
-  _startTimer(seconds) {
-    clearInterval(this._timerInterval);
-    let rem = seconds;
-    const timerEl = document.getElementById('otp-timer');
-    const update = () => {
-      const m = Math.floor(rem/60), s = rem % 60;
-      timerEl.innerHTML = rem > 0
-        ? `OTP expires in <strong>${m}:${String(s).padStart(2,'0')}</strong>`
-        : `<strong style="color:var(--danger)">OTP expired. Go back and request a new one.</strong>`;
-      if (rem-- <= 0) clearInterval(this._timerInterval);
-    };
-    update();
-    this._timerInterval = setInterval(update, 1000);
-  },
-
-  async verifyOTP() {
-    const entered = [0,1,2,3,4,5].map(i =>
-      document.getElementById(`otp-d${i}`)?.value || ''
-    ).join('');
-    if (entered.length < 6) return;
-
-    const btn = document.querySelector('#login-step2 .btn-primary');
-    btn.disabled = true;
-    btn.textContent = 'Verifying…';
-
-    try {
-      const res  = await fetch('/api/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: this._email, otp: entered })
-      });
-      const data = await res.json();
-
-      if (!data.success) {
-        btn.disabled = false;
-        btn.textContent = 'Verify & Login';
-        [0,1,2,3,4,5].forEach(i => {
-          const el = document.getElementById(`otp-d${i}`);
-          if (el) { el.value = ''; el.style.borderColor = 'var(--danger)'; }
-        });
-        document.getElementById('otp-d0')?.focus();
-        const rem = data.attemptsLeft != null ? ` (${data.attemptsLeft} attempts left)` : '';
-        document.getElementById('otp-timer').innerHTML =
-          `<span style="color:var(--danger)">${data.error}${rem}</span>`;
-        return;
-      }
-
-      // Success
-      clearInterval(this._timerInterval);
-      sessionStorage.setItem(this.SESSION_KEY, data.token);
-
-      const hrData = Store.load();
-      const adminUser = (hrData.adminUsers || []).find(u =>
-        (u.email||'').toLowerCase() === this._email.toLowerCase()
-      );
-      const userName = adminUser?.name || 'Admin';
-      const userRole = adminUser?.role || 'HR';
-
-      document.getElementById('login-screen').classList.add('hidden');
-      HR._onLoginSuccess(userName, userRole);
-    } catch (err) {
-      btn.disabled = false;
-      btn.textContent = 'Verify & Login';
-      document.getElementById('otp-timer').innerHTML =
-        `<span style="color:var(--danger)">Network error — try again</span>`;
-    }
+    const el = document.getElementById('login-error');
+    if (el) el.textContent = msg;
   },
 
   logout() {
     if (!confirm('Logout from HR System?')) return;
     sessionStorage.removeItem(this.SESSION_KEY);
-    this._email = null;
-    clearInterval(this._timerInterval);
     document.getElementById('btn-logout').style.display = 'none';
     document.getElementById('header-user-badge').style.display = 'none';
     this.showLogin();
@@ -318,33 +306,39 @@ const Auth = {
 const HR = {
   data: null,
   page: 'dashboard',
+  currentUser: null,
 
   // ── INIT ──────────────────────────────────────────────────
   async init() {
-    this.data = Store.load();
     const loggedIn = await Auth.isLoggedIn();
     if (!loggedIn) {
       Auth.showLogin();
       return;
     }
-    // Re-resolve name/role from stored token phone
+
+    this.data = await Store.load();
+    
+    // Determine current user from token
     const token = sessionStorage.getItem(Auth.SESSION_KEY);
-    let userName = 'Admin', userRole = 'HR';
-    if (token) {
-      try {
-        const { payload } = JSON.parse(atob(token));
-        const email = payload.slice(0, payload.lastIndexOf(':'));
-        const adminUser = (this.data.adminUsers || []).find(u =>
-          (u.email||'').toLowerCase() === email.toLowerCase()
-        );
-        if (adminUser) { userName = adminUser.name; userRole = adminUser.role; }
-      } catch {}
+    const res = await fetch('/api/verify-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
+    const authData = await res.json();
+    
+    if (authData.valid) {
+      const adminUser = (this.data.adminUsers || []).find(u => 
+        (u.email || '').toLowerCase() === (authData.email || '').toLowerCase()
+      );
+      this._onLoginSuccess(adminUser?.name || 'User', adminUser?.role || 'Guest', authData.email);
+    } else {
+      Auth.showLogin();
     }
-    this._onLoginSuccess(userName, userRole);
   },
 
-  _onLoginSuccess(userName, userRole) {
-    this.data = Store.load();
+  _onLoginSuccess(userName, userRole, userEmail) {
+    this.currentUser = { name: userName, role: userRole, email: (userEmail||'').toLowerCase() };
     document.getElementById('sidebar-company').textContent =
       this.data.company.name.split(' ').slice(0,2).join(' ');
     document.getElementById('today-date').textContent =
@@ -363,13 +357,95 @@ const HR = {
     document.getElementById('modal-backdrop').addEventListener('click', e => {
       if (e.target.id === 'modal-backdrop') HR.closeModal();
     });
+    this._updateNavVisibility();
+    this.checkLeaveEscalations();
     this.nav('dashboard');
   },
 
-  save() { Store.save(this.data); },
+  // ── ROLE HELPERS ──────────────────────────────────────────
+  canSeeSalary() {
+    return ['HR', 'Accounts'].includes(this.currentUser?.role);
+  },
+  isHRAdmin() {
+    return ['HR', 'Admin'].includes(this.currentUser?.role);
+  },
+  isManager() {
+    return ['Manager', 'CBO', 'COO'].includes(this.currentUser?.role);
+  },
+  isCEO() {
+    return this.currentUser?.role === 'CEO';
+  },
+  _ceoAdminUser() {
+    return (this.data.adminUsers||[]).find(u => u.role === 'CEO');
+  },
+  _myAdminUser() {
+    return (this.data.adminUsers||[]).find(u =>
+      (u.email||'').toLowerCase() === (this.currentUser?.email||'').toLowerCase()
+    );
+  },
+  getMyTeamEmpIds() {
+    const me = this._myAdminUser();
+    if (!me) return [];
+    return this.data.employees.filter(e => e.managerId === me.id).map(e => e.id);
+  },
+
+  // Returns annual EL entitlement based on tenure: 1.5/mo (<4 yrs) or 2/mo (≥4 yrs)
+  _elAnnual(emp) {
+    if (!emp?.doj) return 18;
+    const years = (Date.now() - new Date(emp.doj).getTime()) / (365.25 * 24 * 3600 * 1000);
+    return years >= 4 ? 24 : 18;
+  },
+  // Returns fresh annual leave balance for an employee
+  _freshLeaveBalance(emp) {
+    return { CL: 7, SL: 6, EL: this._elAnnual(emp), CO: emp?.leaveBalance?.CO || 0 };
+  },
+  _updateNavVisibility() {
+    const role = this.currentUser?.role;
+    const salaryOk   = ['HR', 'Accounts'].includes(role);
+    const settingsOk = ['HR', 'Admin', 'Accounts'].includes(role);
+    document.querySelectorAll('.nav-link').forEach(el => {
+      const page = el.dataset.page;
+      if ((page === 'salary' || page === 'payslip') && !salaryOk) {
+        el.style.display = 'none';
+      } else if (page === 'settings' && !settingsOk) {
+        el.style.display = 'none';
+      } else {
+        el.style.display = '';
+      }
+    });
+  },
+  // Returns the approver admin-user for a given leave (CEO for >2 days, manager otherwise)
+  _resolveApprover(emp, days) {
+    if (days > 2) return this._ceoAdminUser() || null;
+    return emp?.managerId ? (this.data.adminUsers||[]).find(u => u.id === emp.managerId) : null;
+  },
+
+  // ── LEAVE ESCALATION CHECK ────────────────────────────────
+  checkLeaveEscalations() {
+    const today = U.today();
+    let changed = false;
+    (this.data.leaves||[]).forEach(l => {
+      if (l.status === 'pending' && l.to < today) {
+        l.status = 'escalated';
+        l.escalatedOn = today;
+        changed = true;
+      }
+    });
+    if (changed) this.save();
+  },
+
+  async save() { await Store.save(this.data); },
 
   // ── NAVIGATION ────────────────────────────────────────────
   nav(page) {
+    if ((page === 'salary' || page === 'payslip') && !this.canSeeSalary()) {
+      this.toast('Access denied — Salary data is restricted to HR and Accounts only', 'error');
+      return;
+    }
+    if (page === 'settings' && !['HR', 'Admin', 'Accounts'].includes(this.currentUser?.role)) {
+      this.toast('Settings access is restricted', 'error');
+      return;
+    }
     this.page = page;
     document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.dataset.page === page));
     const titles = { dashboard:'Dashboard', employees:'Employee Management', attendance:'Attendance',
@@ -414,15 +490,23 @@ const HR = {
                     + active.filter(e => !markedIds.has(e.id)).length; // unmarked = present
     const onLeave   = todayRecs.filter(a => a.status === 'L').length;
     const absent    = todayRecs.filter(a => a.status === 'A').length;
-    const pending   = this.data.leaves.filter(l => l.status === 'pending').length;
-    const recentLeaves = [...this.data.leaves].sort((a,b) => b.appliedOn > a.appliedOn ? 1 : -1).slice(0,5);
+    const pending = this._myPendingCount();
+    const _dashTeam = this.isManager() ? this.getMyTeamEmpIds() : null;
+    const recentLeaves = [...this.data.leaves]
+      .filter(l => _dashTeam ? _dashTeam.includes(l.empId) : true)
+      .sort((a,b) => {
+        // Escalated first, then by date
+        if (a.status==='escalated' && b.status!=='escalated') return -1;
+        if (b.status==='escalated' && a.status!=='escalated') return 1;
+        return b.appliedOn > a.appliedOn ? 1 : -1;
+      }).slice(0,5);
 
     return `
     <div class="stats-grid">
       <div class="stat-card stat-primary"><div class="stat-icon">👥</div><div class="stat-info"><div class="stat-value">${active.length}</div><div class="stat-label">Active Employees</div></div></div>
       <div class="stat-card stat-success"><div class="stat-icon">✅</div><div class="stat-info"><div class="stat-value">${present}</div><div class="stat-label">Present Today</div></div></div>
       <div class="stat-card stat-warning"><div class="stat-icon">🏖</div><div class="stat-info"><div class="stat-value">${onLeave}</div><div class="stat-label">On Leave Today</div></div></div>
-      <div class="stat-card stat-danger"><div class="stat-icon">⏳</div><div class="stat-info"><div class="stat-value">${pending}</div><div class="stat-label">Pending Leave Approvals</div></div></div>
+      <div class="stat-card stat-danger"><div class="stat-icon">⏳</div><div class="stat-info"><div class="stat-value">${pending}</div><div class="stat-label">${this.isManager() ? 'Awaiting Your Approval' : 'Pending / Escalated Leaves'}</div></div></div>
     </div>
     <div class="dashboard-grid">
       <div class="card">
@@ -456,12 +540,14 @@ const HR = {
             recentLeaves.map(l => {
               const emp = this.data.employees.find(e => e.id === l.empId);
               const lt  = this.data.leaveTypes.find(t => t.id === l.type);
-              return `<div class="leave-item">
+              const stBadge = l.status==='approved'?'success':l.status==='rejected'?'danger':l.status==='escalated'?'danger':'warning';
+              const stLabel = l.status==='escalated'?'⚠ Escalated':l.status;
+              return `<div class="leave-item${l.status==='escalated'?' escalated':''}">
                 <div class="leave-emp">${U.escHtml(emp?.name||'?')}</div>
                 <div class="leave-details">
                   <span class="badge badge-info">${lt?.name||l.type}</span>
                   <span>${l.days} day(s) • ${U.fmtDate(l.from)}</span>
-                  <span class="badge badge-${l.status==='approved'?'success':l.status==='rejected'?'danger':'warning'}">${l.status}</span>
+                  <span class="badge badge-${stBadge}">${stLabel}</span>
                 </div>
               </div>`;
             }).join('')
@@ -507,7 +593,7 @@ const HR = {
       <div class="card-body" style="padding:0">
         <div class="table-wrap">
           <table class="table" id="emp-table">
-            <thead><tr><th>Emp ID</th><th>Name</th><th>Designation</th><th>Department</th><th>Grade</th><th>DOJ</th><th>Gross Salary</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Emp ID</th><th>Name</th><th>Designation</th><th>Department</th><th>Grade</th><th>DOJ</th>${this.canSeeSalary() ? '<th>Gross Salary</th>' : ''}<th>Status</th><th>Actions</th></tr></thead>
             <tbody id="emp-tbody">${this.empRows(this.data.employees)}</tbody>
           </table>
         </div>
@@ -515,22 +601,24 @@ const HR = {
     </div>`;
   },
   empRows(list) {
-    if (!list.length) return `<tr><td colspan="9"><div class="empty-state"><p>No employees found</p></div></td></tr>`;
+    const cols = this.canSeeSalary() ? 9 : 8;
+    if (!list.length) return `<tr><td colspan="${cols}"><div class="empty-state"><p>No employees found</p></div></td></tr>`;
     return list.map(e => {
       const s = e.salary || {};
       const gross = (s.basic||0) + (s.hra||0) + (s.prodIncentive||0);
+      const mgr = e.managerId ? (this.data.adminUsers||[]).find(u => u.id === e.managerId) : null;
       return `<tr>
         <td><strong>${e.id}</strong></td>
-        <td>${U.escHtml(e.name)}</td>
+        <td>${U.escHtml(e.name)}${mgr ? `<div class="text-muted text-sm">Manager: ${U.escHtml(mgr.name)}</div>` : ''}</td>
         <td>${U.escHtml(e.designation)}</td>
         <td>${U.escHtml(e.department)}</td>
         <td><span class="badge badge-primary">${e.grade}</span></td>
         <td>${U.fmtDate(e.doj)}</td>
-        <td>₹${U.fmtINR(gross)}</td>
+        ${this.canSeeSalary() ? `<td>₹${U.fmtINR(gross)}</td>` : ''}
         <td><span class="badge badge-${e.status==='active'?'success':'gray'}">${e.status}</span></td>
         <td>
           <button class="btn btn-outline btn-sm" onclick="HR.openEmpForm('${e.id}')">Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="HR.deleteEmp('${e.id}')">Delete</button>
+          ${this.isHRAdmin() ? `<button class="btn btn-danger btn-sm" onclick="HR.deleteEmp('${e.id}')">Delete</button>` : ''}
         </td>
       </tr>`;
     }).join('');
@@ -568,12 +656,19 @@ const HR = {
         </div>
         <div class="form-group"><label>Phone</label><input class="form-control" name="phone" value="${v('phone')}"></div>
         <div class="form-group"><label>Email</label><input class="form-control" type="email" name="email" value="${v('email')}"></div>
+        <div class="form-group"><label>Reporting Manager</label>
+          <select class="form-control" name="managerId">
+            <option value="">— None —</option>
+            ${(this.data.adminUsers||[]).map(u=>`<option value="${u.id}" ${emp?.managerId===u.id?'selected':''}>${U.escHtml(u.name)} (${u.role})</option>`).join('')}
+          </select>
+        </div>
 
         <div class="form-section">Bank Details</div>
         <div class="form-group"><label>Bank Name</label><input class="form-control" name="bankName" value="${v('bankName')}"></div>
         <div class="form-group"><label>IFSC Code</label><input class="form-control" name="ifsc" value="${v('ifsc')}"></div>
         <div class="form-group span-2"><label>Bank Account Number</label><input class="form-control" name="bankAcc" value="${v('bankAcc')}"></div>
 
+        ${this.canSeeSalary() ? `
         <div class="form-section">Salary Structure (Monthly)</div>
         <div class="form-group"><label>Basic Wage (₹)</label><input class="form-control" type="number" name="s_basic" value="${s.basic||0}" min="0"></div>
         <div class="form-group"><label>HRA (₹)</label><input class="form-control" type="number" name="s_hra" value="${s.hra||0}" min="0"></div>
@@ -593,7 +688,7 @@ const HR = {
             <option value="0" ${!s.esi?'selected':''}>No</option>
             <option value="1" ${s.esi?'selected':''}>Yes (${s.esiRate||0.75}% of Gross)</option>
           </select>
-        </div>
+        </div>` : '<div class="alert alert-warning" style="grid-column:1/-1;margin-top:8px">Salary details are restricted to HR and Accounts only.</div>'}
       </div>
       <div class="form-actions">
         <button type="button" class="btn btn-outline" onclick="HR.closeModal()">Cancel</button>
@@ -605,17 +700,20 @@ const HR = {
     e.preventDefault();
     const fd = new FormData(e.target);
     const get = k => fd.get(k) || '';
+    const existing = existingId ? this.data.employees.find(x=>x.id===existingId) : null;
+    const salary = this.canSeeSalary() ? {
+      basic: +get('s_basic')||0, hra: +get('s_hra')||0, prodIncentive: +get('s_prodIncentive')||0,
+      arrears: +get('s_arrears')||0, ot: +get('s_ot')||0, tds: +get('s_tds')||0, advance: +get('s_advance')||0,
+      epf: get('s_epf')==='1', epfRate: 12, esi: get('s_esi')==='1', esiRate: 0.75
+    } : (existing?.salary || { basic:0, hra:0, prodIncentive:0, ot:0, arrears:0, epf:false, epfRate:12, esi:false, esiRate:0.75, tds:0, advance:0 });
     const emp = {
       id: get('id').trim(), name: get('name').trim(), designation: get('designation').trim(),
       department: get('department').trim(), grade: get('grade').trim(), weekOff: get('weekOff').trim(),
       doj: get('doj'), status: get('status'), phone: get('phone').trim(), email: get('email').trim(),
       bankName: get('bankName').trim(), ifsc: get('ifsc').trim(), bankAcc: get('bankAcc').trim(),
-      salary: {
-        basic: +get('s_basic')||0, hra: +get('s_hra')||0, prodIncentive: +get('s_prodIncentive')||0,
-        arrears: +get('s_arrears')||0, ot: +get('s_ot')||0, tds: +get('s_tds')||0, advance: +get('s_advance')||0,
-        epf: get('s_epf')==='1', epfRate: 12, esi: get('s_esi')==='1', esiRate: 0.75
-      },
-      leaveBalance: existingId ? (this.data.employees.find(x=>x.id===existingId)?.leaveBalance || {CL:12,SL:12,EL:15}) : {CL:12,SL:12,EL:15}
+      managerId: get('managerId') || null,
+      salary,
+      leaveBalance: existingId ? (existing?.leaveBalance || this._freshLeaveBalance(null)) : this._freshLeaveBalance(null)
     };
     if (!emp.id) return this.toast('Employee ID is required','error');
     if (existingId) {
@@ -726,7 +824,7 @@ const HR = {
                 const slBal = emp.leaveBalance?.SL ?? 0;
                 const elBal = emp.leaveBalance?.EL ?? 0;
                 const coBal = emp.leaveBalance?.CO ?? 0;
-                return `<tr style="${st==='P' && isSunday ? 'background:#FFFBEB' : ''}">
+                return `<tr class="${st==='P' && isSunday ? 'row-sunday-ot' : ''}">
                   <td>
                     <strong>${U.escHtml(emp.name)}</strong>
                     <div class="text-muted text-sm">${emp.id} · ${U.escHtml(emp.designation)}</div>
@@ -963,24 +1061,45 @@ const HR = {
   // ============================================================
   // LEAVES
   // ============================================================
-  _leaveTab: 'apply',
+  _leaveTab: 'approvals',
   render_leaves() {
+    this.checkLeaveEscalations();
+    const showApply     = this.isHRAdmin();
+    const showApprovals = this.isHRAdmin() || this.isManager() || this.isCEO();
+    const showBalance   = this.isHRAdmin();
+    if (!showApply && this._leaveTab === 'apply') this._leaveTab = 'approvals';
+
+    const escalated = (this.data.leaves||[]).filter(l => l.status === 'escalated').length;
+    const myPending = this._myPendingCount();
+
     return `
     <div class="tabs">
-      <button class="tab-btn ${this._leaveTab==='apply'?'active':''}" onclick="HR.switchLeaveTab('apply')">Record Leave</button>
-      <button class="tab-btn ${this._leaveTab==='requests'?'active':''}" onclick="HR.switchLeaveTab('requests')">Leave Records</button>
-      <button class="tab-btn ${this._leaveTab==='balance'?'active':''}" onclick="HR.switchLeaveTab('balance')">Leave Balance</button>
+      ${showApprovals ? `<button class="tab-btn ${this._leaveTab==='approvals'?'active':''}" onclick="HR.switchLeaveTab('approvals')">
+        Pending Approvals ${myPending > 0 ? `<span class="badge badge-warning" style="margin-left:4px">${myPending}</span>` : ''}
+        ${escalated > 0 && this.isHRAdmin() ? `<span class="badge badge-danger" style="margin-left:2px">${escalated} escalated</span>` : ''}
+      </button>` : ''}
+      <button class="tab-btn ${this._leaveTab==='requests'?'active':''}" onclick="HR.switchLeaveTab('requests')">All Leave Records</button>
+      ${showApply ? `<button class="tab-btn ${this._leaveTab==='apply'?'active':''}" onclick="HR.switchLeaveTab('apply')">Record Leave</button>` : ''}
+      ${showBalance ? `<button class="tab-btn ${this._leaveTab==='balance'?'active':''}" onclick="HR.switchLeaveTab('balance')">Leave Balance</button>` : ''}
     </div>
     <div id="leave-tab-content">${this.renderLeaveTab(this._leaveTab)}</div>`;
   },
   init_leaves() {},
   switchLeaveTab(tab) {
     this._leaveTab = tab;
-    const tabMap = { apply:'record', requests:'leave records', balance:'leave balance' };
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().includes(tabMap[tab]||tab)));
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      const txt = b.textContent.toLowerCase();
+      b.classList.toggle('active',
+        (tab==='approvals' && txt.includes('approval')) ||
+        (tab==='requests' && txt.includes('all leave')) ||
+        (tab==='apply' && txt.includes('record leave')) ||
+        (tab==='balance' && txt.includes('balance'))
+      );
+    });
     document.getElementById('leave-tab-content').innerHTML = this.renderLeaveTab(tab);
   },
   renderLeaveTab(tab) {
+    if (tab === 'approvals') return this.renderLeaveApprovals();
     if (tab === 'apply') return this.renderLeaveApply();
     if (tab === 'requests') return this.renderLeaveRequests();
     if (tab === 'balance') return this.renderLeaveBalance();
@@ -988,21 +1107,27 @@ const HR = {
   },
   renderLeaveApply() {
     const today = U.today();
+    const activeEmps = this.data.employees.filter(e=>e.status==='active');
     return `<div class="card">
       <div class="card-head">
         <h3>Record Leave Entry</h3>
-        <span class="badge badge-info">Admin / Accounts</span>
+        <span class="badge badge-info">HR / Admin only</span>
       </div>
       <div class="card-body">
         <div class="alert alert-info" style="margin-bottom:14px">
-          Record leave on behalf of an employee. Leave balance is automatically deducted upon saving.
+          <strong>≤ 2 days</strong> — routed to the employee's tagged Manager for approval.<br>
+          <strong>&gt; 2 days</strong> — routed to <strong>${U.escHtml(this._ceoAdminUser()?.name || 'CEO')}</strong> (${this._ceoAdminUser()?.role || 'CEO'}) for approval.<br>
+          HR can bypass routing with the direct-approval override.
         </div>
         <form onsubmit="HR.submitLeave(event)">
           <div class="form-grid">
             <div class="form-group">
               <label>Employee *</label>
-              <select class="form-control" name="empId" required>
-                ${this.data.employees.filter(e=>e.status==='active').map(e=>`<option value="${e.id}">${e.name} (${e.id})</option>`).join('')}
+              <select class="form-control" name="empId" required onchange="HR._updateApproverInfo()">
+                ${activeEmps.map(e=>{
+                  const mgr = e.managerId ? (this.data.adminUsers||[]).find(u=>u.id===e.managerId) : null;
+                  return `<option value="${e.id}">${U.escHtml(e.name)} (${e.id})${mgr ? ' → '+U.escHtml(mgr.name) : ''}</option>`;
+                }).join('')}
               </select>
             </div>
             <div class="form-group">
@@ -1013,35 +1138,129 @@ const HR = {
             </div>
             <div class="form-group">
               <label>From Date *</label>
-              <input class="form-control" type="date" name="from" value="${today}" required>
+              <input class="form-control" type="date" name="from" id="leave-from" value="${today}" required onchange="HR._updateApproverInfo()">
             </div>
             <div class="form-group">
               <label>To Date *</label>
-              <input class="form-control" type="date" name="to" value="${today}" required>
+              <input class="form-control" type="date" name="to" id="leave-to" value="${today}" required onchange="HR._updateApproverInfo()">
             </div>
             <div class="form-group">
-              <label>Status</label>
+              <label>Approval Routing</label>
               <select class="form-control" name="status">
-                <option value="approved">Approved</option>
-                <option value="pending">Pending / Under Review</option>
+                <option value="pending">Auto-route to Approver</option>
+                <option value="approved">HR Direct Approval (override)</option>
               </select>
             </div>
             <div class="form-group">
               <label>Recorded By</label>
-              <input class="form-control" name="recordedBy" placeholder="e.g. HR / Accounts">
+              <input class="form-control" name="recordedBy" value="${U.escHtml(this.currentUser?.name||'HR')}">
             </div>
             <div class="form-group span-2">
               <label>Reason / Notes</label>
               <textarea class="form-control" name="reason" rows="2" placeholder="Reason for leave or admin notes…"></textarea>
             </div>
           </div>
+          <div id="mgr-info-box" style="margin-bottom:12px"></div>
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Record Leave</button>
+            <button type="submit" class="btn btn-primary">Submit Leave Request</button>
           </div>
         </form>
       </div>
     </div>`;
   },
+  _updateApproverInfo() {
+    const empSel  = document.querySelector('[name="empId"]');
+    const fromEl  = document.getElementById('leave-from');
+    const toEl    = document.getElementById('leave-to');
+    const box     = document.getElementById('mgr-info-box');
+    if (!box || !empSel || !fromEl || !toEl) return;
+    const emp  = this.data.employees.find(e => e.id === empSel.value);
+    const from = fromEl.value, to = toEl.value;
+    let days = 1;
+    if (from && to && to >= from) {
+      days = Math.round((new Date(to) - new Date(from)) / 86400000) + 1;
+    }
+    const approver = this._resolveApprover(emp, days);
+    const color = days > 2 ? 'var(--primary)' : 'var(--success)';
+    if (approver) {
+      box.innerHTML = `<div class="alert alert-info" style="font-size:13px">
+        <strong>${days} day(s)</strong> — will be sent to
+        <strong style="color:${color}">${U.escHtml(approver.name)}</strong> (${approver.role}) for approval.
+        ${days > 2 ? '<br><em>Above 2 days: CEO approval required.</em>' : ''}
+        If not acted upon before the leave date, it escalates to HR automatically.
+      </div>`;
+    } else {
+      box.innerHTML = `<div class="alert alert-warning" style="font-size:13px">
+        No approver found for this employee. Leave will remain pending until HR takes action.
+      </div>`;
+    }
+  },
+  _myPendingCount() {
+    const actionable = (this.data.leaves||[]).filter(l => l.status === 'pending' || l.status === 'escalated');
+    if (this.isManager()) {
+      const me = this._myAdminUser();
+      return actionable.filter(l => l.approverId === me?.id).length;
+    }
+    if (this.isCEO()) {
+      const ceo = this._ceoAdminUser();
+      return actionable.filter(l => l.approverId === ceo?.id).length;
+    }
+    return actionable.length;
+  },
+
+  renderLeaveApprovals() {
+    const me  = this._myAdminUser();
+    const ceo = this._ceoAdminUser();
+    const leaves = [...(this.data.leaves||[])].filter(l => {
+      if (l.status !== 'pending' && l.status !== 'escalated') return false;
+      if (this.isManager()) return l.approverId === me?.id;
+      if (this.isCEO())    return l.approverId === ceo?.id;
+      return true; // HR/Admin sees all
+    }).sort((a,b) => a.from > b.from ? 1 : -1);
+
+    if (!leaves.length) return `<div class="card"><div class="card-body"><div class="empty-state"><p>No pending approvals</p><div class="text-muted text-sm">All leave requests have been actioned.</div></div></div></div>`;
+
+    return `
+    <div class="card">
+      <div class="card-head"><h3>Pending Leave Approvals</h3>
+        <span class="badge badge-warning">${leaves.length} awaiting action</span>
+      </div>
+      <div class="card-body" style="padding:0">
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Employee</th><th>Leave Type</th><th>From</th><th>To</th><th>Days</th><th>Reason</th><th>Routed To</th><th>Applied On</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>${leaves.map(l => {
+              const emp      = this.data.employees.find(e => e.id === l.empId);
+              const lt       = this.data.leaveTypes.find(t => t.id === l.type);
+              const approver = l.approverId ? (this.data.adminUsers||[]).find(u => u.id === l.approverId) : null;
+              const isEscalated = l.status === 'escalated';
+              const isOverdue   = l.to < U.today();
+              return `<tr class="${isEscalated ? 'row-escalated' : ''}">
+                <td><strong>${U.escHtml(emp?.name||l.empId)}</strong><div class="text-muted text-sm">${l.empId}</div></td>
+                <td><span class="badge badge-info">${lt?.name||l.type}</span>${lt&&!lt.paid?'<br><span class="badge badge-danger" style="margin-top:2px">Unpaid</span>':''}</td>
+                <td>${U.fmtDate(l.from)}</td>
+                <td>${U.fmtDate(l.to)}${isOverdue?'<br><span class="badge badge-danger" style="margin-top:2px;font-size:9px">PAST DATE</span>':''}</td>
+                <td><strong ${l.days>2?'style="color:var(--primary)"':''}>${l.days}</strong>${l.days>2?'<div class="text-muted text-sm" style="font-size:10px">CEO approval</div>':''}</td>
+                <td>${U.escHtml(l.reason||'—')}</td>
+                <td>${approver ? `<strong>${U.escHtml(approver.name)}</strong><div class="text-muted text-sm">${approver.role}</div>` : '<span class="text-muted">—</span>'}</td>
+                <td>${U.fmtDate(l.appliedOn)}</td>
+                <td>
+                  ${isEscalated
+                    ? `<span class="badge badge-danger">Escalated to HR</span>${l.escalatedOn?`<div class="text-sm text-muted">on ${U.fmtDate(l.escalatedOn)}</div>`:''}`
+                    : `<span class="badge badge-warning">Pending</span>`}
+                </td>
+                <td style="white-space:nowrap">
+                  <button class="btn btn-success btn-sm" onclick="HR.actionLeave('${l.id}','approved')">Approve</button>
+                  <button class="btn btn-danger btn-sm" onclick="HR.actionLeave('${l.id}','rejected')">Reject</button>
+                </td>
+              </tr>`;
+            }).join('')}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+  },
+
   submitLeave(e) {
     e.preventDefault();
     const fd = new FormData(e.target);
@@ -1051,64 +1270,98 @@ const HR = {
     const empId = fd.get('empId');
     const emp = this.data.employees.find(x => x.id === empId);
 
-    // Count all calendar days in the range (all days are working days)
     const msPerDay = 86400000;
     const days = Math.round((new Date(to) - new Date(from)) / msPerDay) + 1;
     if (days <= 0) return this.toast('Invalid date range', 'error');
 
-    const typeId    = fd.get('type');
-    const status    = fd.get('status') || 'approved';
-    const lt        = this.data.leaveTypes.find(t => t.id === typeId);
+    const typeId = fd.get('type');
+    const status = fd.get('status') || 'pending';
+    const lt     = this.data.leaveTypes.find(t => t.id === typeId);
 
-    // Check & deduct balance only if approved and paid leave
+    // Deduct balance only if HR directly approves
     if (status === 'approved' && lt?.paid) {
       const bal = emp?.leaveBalance?.[typeId] || 0;
       if (days > bal) return this.toast(`Insufficient balance for ${lt.name}. Available: ${bal} day(s)`, 'error');
       emp.leaveBalance[typeId] = Math.max(0, bal - days);
+      this.markAttendanceForLeave({ empId, type: typeId, from, to, days, reason: fd.get('reason')||'' });
     }
 
+    const approver = this._resolveApprover(emp, days);
     const leave = {
       id: U.uid(), empId, type: typeId, from, to, days,
       reason: fd.get('reason')||'',
-      recordedBy: fd.get('recordedBy')||'Admin',
+      recordedBy: fd.get('recordedBy') || this.currentUser?.name || 'HR',
+      managerId: emp?.managerId || null,
+      approverId: status === 'approved' ? null : (approver?.id || null),
       status,
       appliedOn: U.today()
     };
     this.data.leaves.push(leave);
     this.save();
     e.target.reset();
-    this.toast(`Leave recorded — ${days} day(s) ${status === 'approved' ? '& balance updated' : '(pending)'}`);
-    this.switchLeaveTab('requests');
+    if (status === 'approved') {
+      this.toast(`Leave approved — ${days} day(s) balance deducted & attendance marked`);
+    } else {
+      this.toast(`Leave sent to ${approver ? approver.name + ' (' + approver.role + ')' : 'HR'} for approval (${days} day(s))`);
+    }
+    this.switchLeaveTab('approvals');
+  },
+
+  markAttendanceForLeave(leave) {
+    const curr = new Date(leave.from);
+    const end  = new Date(leave.to);
+    const lt   = this.data.leaveTypes.find(t => t.id === leave.type);
+    while (curr <= end) {
+      const dateStr = curr.toISOString().split('T')[0];
+      this.data.attendance = this.data.attendance.filter(
+        a => !(a.empId === leave.empId && a.date === dateStr)
+      );
+      this.data.attendance.push({
+        empId: leave.empId, date: dateStr, status: 'L',
+        leaveType: leave.type,
+        notes: `Approved leave: ${leave.reason || leave.type}`,
+        isLOP: !lt?.paid, isSundayOT: false
+      });
+      curr.setDate(curr.getDate() + 1);
+    }
   },
   renderLeaveRequests() {
-    const leaves = [...this.data.leaves].sort((a,b) => b.appliedOn > a.appliedOn ? 1 : -1);
-    if (!leaves.length) return `<div class="empty-state"><p>No leave requests yet</p></div>`;
+    const myTeam = this.isManager() ? this.getMyTeamEmpIds() : null;
+    const leaves = [...(this.data.leaves||[])].filter(l => myTeam ? myTeam.includes(l.empId) : true)
+      .sort((a,b) => b.appliedOn > a.appliedOn ? 1 : -1);
+    if (!leaves.length) return `<div class="empty-state"><p>No leave records yet</p></div>`;
+    const canAction = this.isHRAdmin() || this.isManager();
     return `
     <div class="card">
       <div class="card-body" style="padding:0">
         <div class="table-wrap">
           <table class="table">
-            <thead><tr><th>Employee</th><th>Leave Type</th><th>From</th><th>To</th><th>Days</th><th>Reason / Notes</th><th>Recorded By</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Employee</th><th>Leave Type</th><th>From</th><th>To</th><th>Days</th><th>Reason</th><th>Recorded By</th><th>Applied</th><th>Status</th>${canAction?'<th>Actions</th>':''}</tr></thead>
             <tbody>${leaves.map(l => {
               const emp = this.data.employees.find(e => e.id === l.empId);
               const lt  = this.data.leaveTypes.find(t => t.id === l.type);
-              return `<tr>
+              const mgr = l.managerId ? (this.data.adminUsers||[]).find(u => u.id === l.managerId) : null;
+              const statusBadge = l.status==='approved' ? 'success' : l.status==='rejected' ? 'danger' : l.status==='escalated' ? 'danger' : 'warning';
+              return `<tr class="${l.status==='escalated'?'row-escalated':''}">
                 <td><strong>${U.escHtml(emp?.name||l.empId)}</strong><div class="text-muted text-sm">${l.empId}</div></td>
                 <td><span class="badge badge-info">${lt?.name||l.type}</span>${lt&&!lt.paid?'<br><span class="text-sm" style="color:var(--danger)">Unpaid</span>':''}</td>
                 <td>${U.fmtDate(l.from)}</td>
                 <td>${U.fmtDate(l.to)}</td>
                 <td><strong>${l.days}</strong></td>
                 <td>${U.escHtml(l.reason||'—')}</td>
-                <td><span class="badge badge-gray">${U.escHtml(l.recordedBy||'Admin')}</span></td>
+                <td><span class="badge badge-gray">${U.escHtml(l.recordedBy||'HR')}</span>${mgr?`<div class="text-muted text-sm">→ ${U.escHtml(mgr.name)}</div>`:''}</td>
                 <td>${U.fmtDate(l.appliedOn)}</td>
-                <td><span class="badge badge-${l.status==='approved'?'success':l.status==='rejected'?'danger':'warning'}">${l.status}</span></td>
-                <td style="white-space:nowrap">
-                  ${l.status==='pending'?`
+                <td>
+                  <span class="badge badge-${statusBadge}">${l.status==='escalated'?'Escalated to HR':l.status}</span>
+                  ${l.status==='escalated'&&l.escalatedOn?`<div class="text-sm text-muted">${U.fmtDate(l.escalatedOn)}</div>`:''}
+                </td>
+                ${canAction?`<td style="white-space:nowrap">
+                  ${(l.status==='pending'||l.status==='escalated')?`
                     <button class="btn btn-success btn-sm" onclick="HR.actionLeave('${l.id}','approved')">Approve</button>
                     <button class="btn btn-danger btn-sm" onclick="HR.actionLeave('${l.id}','rejected')">Reject</button>
-                  `:`<button class="btn btn-outline btn-sm" onclick="HR.actionLeave('${l.id}','pending')">Revert</button>`}
-                  <button class="btn btn-outline btn-sm" onclick="HR.deleteLeave('${l.id}')">Del</button>
-                </td>
+                  `:l.status==='approved'?`<button class="btn btn-outline btn-sm" onclick="HR.actionLeave('${l.id}','pending')">Revert</button>`:''}
+                  ${this.isHRAdmin()?`<button class="btn btn-outline btn-sm" onclick="HR.deleteLeave('${l.id}')">Delete</button>`:''}
+                </td>`:''}
               </tr>`;
             }).join('')}</tbody>
           </table>
@@ -1121,26 +1374,44 @@ const HR = {
     if (!leave) return;
     const oldStatus = leave.status;
     leave.status = newStatus;
+    if (newStatus !== 'escalated') delete leave.escalatedOn;
 
     const emp = this.data.employees.find(e => e.id === leave.empId);
     const lt  = this.data.leaveTypes.find(t => t.id === leave.type);
 
-    // Deduct balance when approving a pending leave
+    // Approve: deduct balance + mark attendance
     if (newStatus === 'approved' && oldStatus !== 'approved') {
-      if (emp && lt?.paid && emp.leaveBalance[leave.type] != null) {
+      if (emp && lt?.paid) {
         emp.leaveBalance[leave.type] = Math.max(0, (emp.leaveBalance[leave.type]||0) - leave.days);
       }
+      this.markAttendanceForLeave(leave);
     }
-    // Restore balance when reverting an approved leave back to pending/rejected
+    // Revert approved → remove attendance marks + restore balance
     if (oldStatus === 'approved' && newStatus !== 'approved') {
-      if (emp && lt?.paid && emp.leaveBalance[leave.type] != null) {
+      if (emp && lt?.paid) {
         emp.leaveBalance[leave.type] = (emp.leaveBalance[leave.type]||0) + leave.days;
+      }
+      // Remove attendance records for this leave's dates
+      const curr = new Date(leave.from);
+      const end  = new Date(leave.to);
+      while (curr <= end) {
+        const ds = curr.toISOString().split('T')[0];
+        this.data.attendance = this.data.attendance.filter(
+          a => !(a.empId === leave.empId && a.date === ds && a.status === 'L' && a.leaveType === leave.type)
+        );
+        curr.setDate(curr.getDate() + 1);
       }
     }
 
     this.save();
-    this.switchLeaveTab('requests');
-    this.toast(`Leave status updated to: ${newStatus}`);
+    this.switchLeaveTab(this._leaveTab);
+    if (newStatus === 'approved') {
+      this.toast(`Leave approved — balance deducted & attendance marked for ${leave.days} day(s)`);
+    } else if (newStatus === 'rejected') {
+      this.toast(`Leave rejected for ${emp?.name || leave.empId}`);
+    } else {
+      this.toast(`Leave reverted to pending`);
+    }
   },
   deleteLeave(id) {
     if (!confirm('Delete this leave record?')) return;
@@ -1151,6 +1422,12 @@ const HR = {
   },
   renderLeaveBalance() {
     return `
+    <div class="alert alert-info" style="margin-bottom:16px">
+      <strong>Leave Policy:</strong>
+      CL = 7 days/yr &nbsp;|&nbsp; SL = 6 days/yr &nbsp;|&nbsp;
+      EL = <strong>1.5 days/month (18/yr)</strong> for &lt;4 yrs tenure,
+      <strong>2 days/month (24/yr)</strong> for ≥4 yrs tenure
+    </div>
     <div class="card">
       <div class="card-head"><h3>Leave Balance — Current Year</h3></div>
       <div class="card-body" style="padding:0">
@@ -1158,17 +1435,23 @@ const HR = {
           <table class="table">
             <thead><tr>
               <th>Employee</th>
+              <th>Tenure</th>
               ${this.data.leaveTypes.filter(t=>t.paid).map(t=>`<th>${t.name}</th>`).join('')}
               <th>Actions</th>
             </tr></thead>
-            <tbody>${this.data.employees.filter(e=>e.status==='active').map(emp=>`<tr>
+            <tbody>${this.data.employees.filter(e=>e.status==='active').map(emp=>{
+              const years = emp.doj ? ((Date.now()-new Date(emp.doj).getTime())/(365.25*24*3600*1000)) : null;
+              const tenureStr = years !== null ? (years>=1 ? `${Math.floor(years)}y ${Math.floor((years%1)*12)}m` : `${Math.floor(years*12)}m`) : '—';
+              const elRate = years !== null ? (years>=4 ? '2/mo' : '1.5/mo') : '1.5/mo';
+              return `<tr>
               <td><strong>${U.escHtml(emp.name)}</strong><br><span class="text-muted text-sm">${emp.id}</span></td>
+              <td><span class="text-sm">${tenureStr}</span><br><span class="badge badge-${years!==null&&years>=4?'primary':'info'}" style="font-size:10px">EL ${elRate}</span></td>
               ${this.data.leaveTypes.filter(t=>t.paid).map(t=>{
                 const bal = emp.leaveBalance?.[t.id]??0;
                 return `<td><span class="badge badge-${bal>5?'success':bal>0?'warning':'danger'}">${bal} days</span></td>`;
               }).join('')}
               <td><button class="btn btn-outline btn-sm" onclick="HR.editLeaveBalance('${emp.id}')">Adjust</button></td>
-            </tr>`).join('')}</tbody>
+            </tr>`;}).join('')}</tbody>
           </table>
         </div>
       </div>
@@ -1178,7 +1461,13 @@ const HR = {
     const emp = this.data.employees.find(e => e.id === empId);
     if (!emp) return;
     const paidTypes = this.data.leaveTypes.filter(t => t.paid);
+    const elEntitlement = this._elAnnual(emp);
+    const years = emp.doj ? ((Date.now()-new Date(emp.doj).getTime())/(365.25*24*3600*1000)) : null;
     this.openModal(`Adjust Leave Balance – ${emp.name}`, `
+    <div class="alert alert-info" style="margin-bottom:14px">
+      Annual entitlement: CL 7 &nbsp;·&nbsp; SL 6 &nbsp;·&nbsp; EL ${elEntitlement}
+      ${years!==null?`(${years>=4?'≥4 yrs → 2/mo':'<4 yrs → 1.5/mo'})` : ''}
+    </div>
     <form onsubmit="HR.saveLeaveBalance(event,'${empId}')">
       <div class="form-grid">
         ${paidTypes.map(t=>`
@@ -1301,7 +1590,7 @@ const HR = {
                     <button class="btn btn-primary btn-sm" onclick="HR.printPayslipById('${ps.id}')">Print</button>
                     <button class="btn btn-outline btn-sm" onclick="HR.downloadPayslipPDF('${ps.id}')">⬇ PDF</button>
                     <button class="btn btn-success btn-sm" onclick="HR.sendWhatsApp('${ps.id}')">📱 WA</button>
-                    <button class="btn btn-danger btn-sm" onclick="HR.deletePayslip('${ps.id}')">Del</button>
+                    <button class="btn btn-danger btn-sm" onclick="HR.deletePayslip('${ps.id}')">Delete</button>
                   </td>
                 </tr>`;
               }).join('')
@@ -1803,17 +2092,17 @@ const HR = {
 
       <div class="card">
         <div class="card-head">
-          <h3>Admin Users (OTP Login)</h3>
+          <h3>Admin Users &amp; Passwords</h3>
           <button class="btn btn-primary btn-sm" onclick="HR.openAdminUserForm()">+ Add User</button>
         </div>
         <div class="card-body" style="padding:0">
           <table class="table">
-            <thead><tr><th>Name</th><th>Role</th><th>Email</th><th></th></tr></thead>
+            <thead><tr><th>Name</th><th>Role</th><th>Email</th><th>Password</th><th></th></tr></thead>
             <tbody id="admin-users-tbody">${this.adminUserRows()}</tbody>
           </table>
         </div>
         <div style="padding:10px 16px;font-size:11px;color:var(--gray-400)">
-          OTP will be sent to the email address of the selected user at login.
+          Default password for all users: <strong>Snl@1234</strong>. Edit any user to set a custom password.
         </div>
       </div>
 
@@ -1847,7 +2136,7 @@ const HR = {
       <td>${U.escHtml(t.name)}</td>
       <td>${t.annual}</td>
       <td><span class="badge badge-${t.paid?'success':'danger'}">${t.paid?'Paid':'Unpaid'}</span></td>
-      <td><button class="btn btn-danger btn-sm" onclick="HR.deleteLeaveType('${t.id}')">Del</button></td>
+      <td><button class="btn btn-danger btn-sm" onclick="HR.deleteLeaveType('${t.id}')">Delete</button></td>
     </tr>`).join('');
   },
   openLeaveTypeForm() {
@@ -1890,7 +2179,7 @@ const HR = {
     const sorted = [...this.data.holidays].sort((a,b) => a.date > b.date ? 1 : -1);
     return sorted.map(h => `<li class="holiday-item">
       <span><strong>${U.fmtDate(h.date)}</strong> — ${U.escHtml(h.name)}</span>
-      <button class="btn btn-danger btn-sm" onclick="HR.deleteHoliday('${h.date}')">Del</button>
+      <button class="btn btn-danger btn-sm" onclick="HR.deleteHoliday('${h.date}')">Delete</button>
     </li>`).join('') || '<li class="text-muted text-sm">No holidays added</li>';
   },
   openHolidayForm() {
@@ -2029,12 +2318,13 @@ const HR = {
     return (this.data.adminUsers || []).map(u => `<tr>
       <td><strong>${U.escHtml(u.name)}</strong></td>
       <td><span class="badge badge-info">${U.escHtml(u.role)}</span></td>
-      <td>${u.email ? U.escHtml(u.email) : '<span class="text-muted">Not set</span>'}</td>
+      <td style="font-size:12px">${u.email ? U.escHtml(u.email) : '<span class="text-muted">Not set</span>'}</td>
+      <td style="font-size:12px">${u.password ? '<span style="color:var(--success)">●●●●●●</span>' : '<span class="text-muted">default</span>'}</td>
       <td>
         <button class="btn btn-outline btn-sm" onclick="HR.openAdminUserForm('${u.id}')">Edit</button>
-        <button class="btn btn-danger btn-sm" onclick="HR.deleteAdminUser('${u.id}')">Del</button>
+        <button class="btn btn-danger btn-sm" onclick="HR.deleteAdminUser('${u.id}')">Delete</button>
       </td>
-    </tr>`).join('') || '<tr><td colspan="4" class="text-muted text-sm" style="padding:12px">No admin users. Add at least one.</td></tr>';
+    </tr>`).join('') || '<tr><td colspan="5" class="text-muted text-sm" style="padding:12px">No admin users. Add at least one.</td></tr>';
   },
 
   openAdminUserForm(id) {
@@ -2049,11 +2339,19 @@ const HR = {
             <option value="HR"${u?.role==='HR'?' selected':''}>HR</option>
             <option value="Accounts"${u?.role==='Accounts'?' selected':''}>Accounts</option>
             <option value="Admin"${u?.role==='Admin'?' selected':''}>Admin</option>
-            <option value="Management"${u?.role==='Management'?' selected':''}>Management</option>
+            <option value="CEO"${u?.role==='CEO'?' selected':''}>CEO (Approves leaves &gt;2 days)</option>
+            <option value="COO"${u?.role==='COO'?' selected':''}>COO (Approves leaves ≤2 days)</option>
+            <option value="CBO"${u?.role==='CBO'?' selected':''}>CBO (Approves leaves ≤2 days)</option>
+            <option value="Manager"${u?.role==='Manager'?' selected':''}>Manager (Approves leaves ≤2 days)</option>
+            <option value="Management"${u?.role==='Management'?' selected':''}>Management (View only)</option>
           </select></div>
-        <div class="form-group"><label>Email Address (for OTP login)</label>
+        <div class="form-group"><label>Email Address</label>
           <input class="form-control" name="email" type="email"
             value="${U.escHtml(u?.email||'')}" placeholder="e.g. hr@snlinnovations.com" required></div>
+        <div class="form-group"><label>${u ? 'New Password (leave blank to keep current)' : 'Password'}</label>
+          <input class="form-control" name="password" type="password"
+            placeholder="${u ? 'Enter new password to change' : 'Min 6 characters'}">
+          ${!u ? '<small style="color:var(--gray-400);font-size:11px">Default if blank: Snl@1234</small>' : ''}</div>
       </div>
       <div class="form-actions">
         <button type="button" class="btn btn-outline" onclick="HR.closeModal()">Cancel</button>
@@ -2065,13 +2363,22 @@ const HR = {
   saveAdminUser(e, id) {
     e.preventDefault();
     const fd = new FormData(e.target);
-    const email = (fd.get('email')||'').trim().toLowerCase();
+    const email   = (fd.get('email') || '').trim().toLowerCase();
+    const newPass = (fd.get('password') || '').trim();
     if (!this.data.adminUsers) this.data.adminUsers = [];
     if (id) {
       const u = this.data.adminUsers.find(x => x.id === id);
-      if (u) { u.name = fd.get('name'); u.role = fd.get('role'); u.email = email; }
+      if (u) {
+        u.name  = fd.get('name');
+        u.role  = fd.get('role');
+        u.email = email;
+        if (newPass) u.password = newPass;
+      }
     } else {
-      this.data.adminUsers.push({ id: U.uid(), name: fd.get('name'), role: fd.get('role'), email });
+      this.data.adminUsers.push({
+        id: U.uid(), name: fd.get('name'), role: fd.get('role'), email,
+        password: newPass || 'Snl@1234'
+      });
     }
     this.save(); this.closeModal();
     document.getElementById('admin-users-tbody').innerHTML = this.adminUserRows();
