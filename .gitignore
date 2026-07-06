@@ -6,3 +6,5 @@ Thumbs.db
 database.json
 server_out.log
 server_err.log
+
+.vercel

@@ -727,3 +727,35 @@ strong { color: var(--gray-900); }
   display: flex; align-items: center; justify-content: center;
   font-weight: 700; font-size: 13px; color: #fff;
 }
+
+/* ── Team Leave Calendar ─────────────────────────── */
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.cal-hdr {
+  font-size: 11px; font-weight: 700; text-align: center;
+  padding: 6px 2px; color: var(--gray-500); text-transform: uppercase;
+}
+.cal-cell {
+  min-height: 72px; border: 1px solid var(--gray-100);
+  border-radius: var(--radius-sm); padding: 4px;
+  background: #fff; font-size: 11px;
+  overflow: hidden;
+}
+.cal-cell.cal-empty { background: transparent; border-color: transparent; }
+.cal-cell.cal-weekend { background: var(--gray-50); }
+.cal-cell.cal-holiday { background: #fff0f0; }
+.cal-cell.cal-today { border-color: var(--primary); border-width: 2px; }
+.cal-day {
+  font-size: 12px; font-weight: 600; color: var(--gray-700);
+  margin-bottom: 3px; display: flex; align-items: center; gap: 3px;
+}
+.cal-hol-dot { color: var(--danger); font-size: 8px; }
+.cal-emp-dot {
+  font-size: 9px; font-weight: 600; color: #fff;
+  border-radius: 3px; padding: 1px 4px;
+  margin-bottom: 2px; white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis; max-width: 100%;
+}

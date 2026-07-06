@@ -48,6 +48,36 @@ const U = {
   escHtml(s) {
     if (!s) return '';
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  },
+  // Count working days between two date strings, skipping weekly off day and public holidays
+  countWorkingDays(from, to, holidays = [], weekOff = 'Sun') {
+    let count = 0;
+    const cur = new Date(from);
+    const end = new Date(to);
+    const offSet = new Set(holidays);
+    const offDow = weekOff === 'Sat' ? 6 : 0;
+    while (cur <= end) {
+      const dow = cur.getDay();
+      const ds  = cur.toISOString().split('T')[0];
+      if (dow !== offDow && !offSet.has(ds)) count++;
+      cur.setDate(cur.getDate() + 1);
+    }
+    return count;
+  },
+  // List individual working dates between two strings
+  workingDates(from, to, holidays = [], weekOff = 'Sun') {
+    const dates = [];
+    const cur = new Date(from);
+    const end = new Date(to);
+    const offSet = new Set(holidays);
+    const offDow = weekOff === 'Sat' ? 6 : 0;
+    while (cur <= end) {
+      const dow = cur.getDay();
+      const ds  = cur.toISOString().split('T')[0];
+      if (dow !== offDow && !offSet.has(ds)) dates.push(ds);
+      cur.setDate(cur.getDate() + 1);
+    }
+    return dates;
   }
 };
 
@@ -74,35 +104,35 @@ const Store = {
         { id:'1002', name:'Liza Gupta',           doj:'2018-02-02', designation:'COO',        department:'Operations',         weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'liza@innofarms.co.in',       status:'active', managerId:'adm6', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,CO:0} },
         { id:'1022', name:'Saurabh Gupta',        doj:'',           designation:'CBO',        department:'Business Operations',weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'saurabh@innofarms.co.in',    status:'active', managerId:'adm6', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,CO:0} },
         // ── EMPLOYEES (by code order) ──────────────────────────────
-        { id:'1003', name:'Gopal Kumar',          doj:'2020-11-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:2,  CO:0} },
-        { id:'1004', name:'Krishan Gopal',        doj:'2020-11-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:6,  CO:0} },
-        { id:'1005', name:'Ashim Nath',           doj:'2021-07-09', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:4.5,CO:0} },
-        { id:'1006', name:'Asaram',               doj:'',           designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1007', name:'Dharmveer',            doj:'',           designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1008', name:'Gopal Singh',          doj:'2018-02-02', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1009', name:'Jainarayan',           doj:'',           designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:3,  CO:0} },
-        { id:'1010', name:'Brijendra Singh',      doj:'2021-07-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1011', name:'Rajesh Kumar Meena',   doj:'2023-02-13', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:2.5,CO:0} },
-        { id:'1012', name:'Talib',                doj:'2023-08-17', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1013', name:'Manoj Meena',          doj:'2023-07-21', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1014', name:'Sandeep',              doj:'2020-05-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1017', name:'Namit Rawat',          doj:'2024-05-20', designation:"Founder's Office", department:'Sales & Marketing', weekOff:'Sat,Sun', grade:'L-5', bankName:'BOB', ifsc:'BARB0JAWJAI', bankAcc:'30120100013795', phone:'', email:'', status:'active', managerId:'adm3', salary:{basic:18214,hra:18214,prodIncentive:1429,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1003', name:'Gopal Kumar',          doj:'2020-11-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'adm6',     salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:2,  CO:0} },
+        { id:'1004', name:'Krishan Gopal',        doj:'2020-11-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'adm6',     salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:6,  CO:0} },
+        { id:'1005', name:'Ashim Nath',           doj:'2021-07-09', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'adm5',     salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:4.5,CO:0} },
+        { id:'1006', name:'Asaram',               doj:'',           designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1007', name:'Dharmveer',            doj:'',           designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1008', name:'Gopal Singh',          doj:'2018-02-02', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'adm6',     salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1009', name:'Jainarayan',           doj:'',           designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:3,  CO:0} },
+        { id:'1010', name:'Brijendra Singh',      doj:'2021-07-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1011', name:'Rajesh Kumar Meena',   doj:'2023-02-13', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:2.5,CO:0} },
+        { id:'1012', name:'Talib',                doj:'2023-08-17', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1013', name:'Manoj Meena',          doj:'2023-07-21', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1014', name:'Sandeep',              doj:'2020-05-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1017', name:'Namit Rawat',          doj:'2024-05-20', designation:"Founder's Office", department:'Sales & Marketing', weekOff:'Sun', grade:'L-5', bankName:'BOB', ifsc:'BARB0JAWJAI', bankAcc:'30120100013795', phone:'', email:'', status:'active', managerId:'adm3', salary:{basic:18214,hra:18214,prodIncentive:1429,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
         { id:'1018', name:'Abhinav Gupta',        doj:'2024-06-15', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'adm3', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1021', name:'Ramesh Prajapati',     doj:'2024-12-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:6,  CO:0} },
-        { id:'1026', name:'Dashrath Choudhary',   doj:'2025-04-21', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1027', name:'Dinesh Dagur',         doj:'2025-04-28', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1029', name:'Om Prakash Dhoboi',    doj:'2025-06-08', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1032', name:'Manraj Bairwa',        doj:'2025-06-12', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1034', name:'Vimal Mahawar',        doj:'2025-07-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1035', name:'Keshav',               doj:'2025-07-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1038', name:'Pravej Khan',          doj:'2025-07-17', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:1.5,CO:0} },
+        { id:'1021', name:'Ramesh Prajapati',     doj:'2024-12-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:6,  CO:0} },
+        { id:'1026', name:'Dashrath Choudhary',   doj:'2025-04-21', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1005', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1027', name:'Dinesh Dagur',         doj:'2025-04-28', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1029', name:'Om Prakash Dhoboi',    doj:'2025-06-08', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1032', name:'Manraj Bairwa',        doj:'2025-06-12', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1034', name:'Vimal Mahawar',        doj:'2025-07-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1035', name:'Keshav',               doj:'2025-07-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1038', name:'Pravej Khan',          doj:'2025-07-17', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:1.5,CO:0} },
         { id:'1039', name:'Chandresh Modi',       doj:'2025-07-17', designation:'Accountant', department:'Accounts & Finance', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'chandresh@innofarms.co.in', status:'active', managerId:'adm6', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1041', name:'Kailash Chand Nogya',  doj:'2025-08-19', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1044', name:'Astha Oberoi',         doj:'2025-10-08', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1045', name:'Bhanu Pratap',         doj:'2025-10-13', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1041', name:'Kailash Chand Nogya',  doj:'2025-08-19', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1044', name:'Astha Oberoi',         doj:'2025-10-08', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'adm6',     salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1045', name:'Bhanu Pratap',         doj:'2025-10-13', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
         { id:'1046', name:'Akhil Bhaskar',        doj:'2026-01-01', designation:'HR Manager', department:'Human Resources', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'akhil@innofarms.co.in', status:'active', managerId:'adm6', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1047', name:'Tarun Agarwal',        doj:'2026-02-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
-        { id:'1049', name:'Priyanshi Jain',       doj:'2026-03-16', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:null,   salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1047', name:'Tarun Agarwal',        doj:'2026-02-01', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'emp_1003', salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
+        { id:'1049', name:'Priyanshi Jain',       doj:'2026-03-16', designation:'', department:'', weekOff:'Sun', grade:'', bankName:'', ifsc:'', bankAcc:'', phone:'', email:'', status:'active', managerId:'adm3',     salary:{basic:0,hra:0,prodIncentive:0,ot:0,arrears:0,epf:false,epfRate:12,esi:false,esiRate:0.75,tds:0,advance:0}, leaveBalance:{CL:7,SL:6,EL:0,  CO:0} },
       ],
       attendance: [],
       leaves: [],
@@ -171,25 +201,10 @@ const Store = {
 // ============================================================
 const Auth = {
   SESSION_KEY: 'hr_snl_token',
-
-  async isLoggedIn() {
-    const token = sessionStorage.getItem(this.SESSION_KEY);
-    if (!token) return false;
-    try {
-      const res  = await fetch('/api/verify-token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token })
-      });
-      const data = await res.json();
-      return data.valid === true;
-    } catch { return false; }
-  },
+  _loginType: 'admin',
 
   showLogin() {
-    // Use local defaults — no API call needed before login
     const adminUsers = Store.defaults().adminUsers;
-
     document.getElementById('login-screen').classList.remove('hidden');
 
     const sel = document.getElementById('login-user-select');
@@ -206,6 +221,18 @@ const Auth = {
 
     document.getElementById('login-email-input').value = '';
     document.getElementById('login-password-input').value = '';
+    document.getElementById('login-empid-input').value = '';
+    document.getElementById('login-emp-password').value = '';
+    this._showError('');
+    this.switchTab('admin');
+  },
+
+  switchTab(type) {
+    this._loginType = type;
+    document.getElementById('tab-admin').classList.toggle('active', type === 'admin');
+    document.getElementById('tab-emp').classList.toggle('active', type === 'employee');
+    document.getElementById('login-admin-section').style.display = type === 'admin' ? '' : 'none';
+    document.getElementById('login-emp-section').style.display   = type === 'employee' ? '' : 'none';
     this._showError('');
   },
 
@@ -258,10 +285,66 @@ const Auth = {
       btn.disabled = false;
       btn.textContent = 'Login →';
 
-      const hrData = await Store.load();
-      HR.data = hrData;
+      HR.data = data.hrData ? { ...Store.defaults(), ...data.hrData } : await Store.load();
       HR._onLoginSuccess(data.name, data.role, data.email);
     } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Login →';
+      this._showError('Network error — is the server running?');
+    }
+  },
+
+  async employeeLogin() {
+    const empIdInput  = document.getElementById('login-empid-input');
+    const pwInput     = document.getElementById('login-emp-password');
+    const empId       = (empIdInput.value || '').trim();
+    const password    = pwInput.value || '';
+
+    empIdInput.style.borderColor = '';
+    pwInput.style.borderColor    = '';
+
+    if (!empId) {
+      empIdInput.style.borderColor = 'var(--danger)';
+      this._showError('Enter your Employee ID');
+      empIdInput.focus();
+      return;
+    }
+    if (!password) {
+      pwInput.style.borderColor = 'var(--danger)';
+      this._showError('Enter your password');
+      pwInput.focus();
+      return;
+    }
+
+    const btn = document.getElementById('login-btn');
+    btn.disabled = true;
+    btn.textContent = 'Signing in…';
+
+    try {
+      const res  = await fetch('/api/employee-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ empId, password })
+      });
+      const data = await res.json();
+
+      if (!data.success) {
+        btn.disabled = false;
+        btn.textContent = 'Login →';
+        pwInput.value = '';
+        pwInput.style.borderColor = 'var(--danger)';
+        this._showError(data.error || 'Login failed');
+        return;
+      }
+
+      sessionStorage.setItem(this.SESSION_KEY, data.token);
+      document.getElementById('login-screen').classList.add('hidden');
+      btn.disabled = false;
+      btn.textContent = 'Login →';
+
+      HR.data = data.hrData ? { ...Store.defaults(), ...data.hrData } : await Store.load();
+      HR._onLoginSuccess(data.name, 'Employee', '', data.empId);
+    } catch {
       btn.disabled = false;
       btn.textContent = 'Login →';
       this._showError('Network error — is the server running?');
@@ -292,35 +375,32 @@ const HR = {
 
   // ── INIT ──────────────────────────────────────────────────
   async init() {
-    const loggedIn = await Auth.isLoggedIn();
-    if (!loggedIn) {
-      Auth.showLogin();
-      return;
-    }
-
-    this.data = await Store.load();
-    
-    // Determine current user from token
     const token = sessionStorage.getItem(Auth.SESSION_KEY);
-    const res = await fetch('/api/verify-token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token })
-    });
-    const authData = await res.json();
-    
-    if (authData.valid) {
-      const adminUser = (this.data.adminUsers || []).find(u => 
-        (u.email || '').toLowerCase() === (authData.email || '').toLowerCase()
-      );
-      this._onLoginSuccess(adminUser?.name || 'User', adminUser?.role || 'Guest', authData.email);
-    } else {
-      Auth.showLogin();
-    }
+    if (!token) { Auth.showLogin(); return; }
+
+    try {
+      const res      = await fetch('/api/verify-token', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+      const authData = await res.json();
+      if (!authData.valid) { Auth.showLogin(); return; }
+
+      this.data = authData.hrData ? { ...Store.defaults(), ...authData.hrData } : await Store.load();
+
+      if (authData.type === 'employee') {
+        const emp = this.data.employees.find(e => e.id === authData.empId);
+        if (!emp) { Auth.showLogin(); return; }
+        this._onLoginSuccess(emp.name, 'Employee', emp.email || '', authData.empId);
+      } else {
+        // Server now includes name+role in verify-token response (same DEFAULT_ADMIN_USERS fallback as login)
+        this._onLoginSuccess(authData.name || 'User', authData.role || 'Guest', authData.email);
+      }
+    } catch { Auth.showLogin(); }
   },
 
-  _onLoginSuccess(userName, userRole, userEmail) {
-    this.currentUser = { name: userName, role: userRole, email: (userEmail||'').toLowerCase() };
+  async _onLoginSuccess(userName, userRole, userEmail, empId = null) {
+    this.currentUser = { name: userName, role: userRole, email: (userEmail||'').toLowerCase(), empId };
     document.getElementById('sidebar-company').textContent =
       this.data.company.name.split(' ').slice(0,2).join(' ');
     document.getElementById('today-date').textContent =
@@ -340,23 +420,31 @@ const HR = {
       if (e.target.id === 'modal-backdrop') HR.closeModal();
     });
     this._updateNavVisibility();
-    this.checkLeaveEscalations();
-    this.nav('dashboard');
+    await this.checkLeaveEscalations();
+    if (userRole !== 'Employee') await this.accrueMonthlyEL();
+    this.nav(userRole === 'Employee' ? 'portal' : 'dashboard');
   },
 
   // ── ROLE HELPERS ──────────────────────────────────────────
-  canSeeSalary() {
-    return this.currentUser?.role === 'Accounts';
+  canSeeSalary() { return ['Accounts', 'HR', 'Admin'].includes(this.currentUser?.role); },
+  isHRAdmin()    { return ['HR', 'Admin', 'Management'].includes(this.currentUser?.role); },
+  isManager()    { return ['Manager', 'CBO', 'COO'].includes(this.currentUser?.role); },
+  isCEO()        { return this.currentUser?.role === 'CEO'; },
+  isEmployeeLogin() { return this.currentUser?.role === 'Employee'; },
+
+  currentEmp() {
+    return this.data.employees.find(e => e.id === this.currentUser?.empId) || null;
   },
-  isHRAdmin() {
-    return ['HR', 'Admin'].includes(this.currentUser?.role);
+  isEmployeeManager() {
+    const id = this.currentUser?.empId;
+    return id ? this.data.employees.some(e => e.managerId === 'emp_' + id) : false;
   },
-  isManager() {
-    return ['Manager', 'CBO', 'COO'].includes(this.currentUser?.role);
+  getMyEmployeeTeamIds() {
+    const id = this.currentUser?.empId;
+    if (!id) return [];
+    return this.data.employees.filter(e => e.managerId === 'emp_' + id).map(e => e.id);
   },
-  isCEO() {
-    return this.currentUser?.role === 'CEO';
-  },
+
   _ceoAdminUser() {
     return (this.data.adminUsers||[]).find(u => u.role === 'CEO');
   },
@@ -383,16 +471,24 @@ const HR = {
   },
   _updateNavVisibility() {
     const role = this.currentUser?.role;
-    const salaryOk   = role === 'Accounts';
-    const settingsOk = ['HR', 'Admin', 'Accounts'].includes(role);
+    const isEmp      = role === 'Employee';
+    const salaryOk   = ['Accounts', 'HR', 'Admin'].includes(role);
+    const settingsOk = ['HR', 'Admin', 'Accounts', 'Management'].includes(role);
     document.querySelectorAll('.nav-link').forEach(el => {
       const page = el.dataset.page;
-      if ((page === 'salary' || page === 'payslip') && !salaryOk) {
-        el.style.display = 'none';
-      } else if (page === 'settings' && !settingsOk) {
-        el.style.display = 'none';
+      if (isEmp) {
+        // Employees see only their portal link
+        el.style.display = page === 'portal' ? '' : 'none';
       } else {
-        el.style.display = '';
+        // Admin users never see the portal link
+        if (page === 'portal') { el.style.display = 'none'; return; }
+        if ((page === 'salary' || page === 'payslip') && !salaryOk) {
+          el.style.display = 'none';
+        } else if (page === 'settings' && !settingsOk) {
+          el.style.display = 'none';
+        } else {
+          el.style.display = '';
+        }
       }
     });
   },
@@ -402,8 +498,32 @@ const HR = {
     return emp?.managerId ? (this.data.adminUsers||[]).find(u => u.id === emp.managerId) : null;
   },
 
+  // ── MONTHLY PL (EL) ACCRUAL ──────────────────────────────
+  async accrueMonthlyEL() {
+    const currentYM = U.currentYM();
+    let changed = false;
+    (this.data.employees || []).forEach(emp => {
+      if (emp.status !== 'active' || !emp.doj) return;
+      const lastAccrued = emp.elLastAccrued || emp.doj.slice(0, 7);
+      if (lastAccrued >= currentYM) return;
+
+      const [ly, lm] = lastAccrued.split('-').map(Number);
+      const [cy, cm] = currentYM.split('-').map(Number);
+      const months = (cy - ly) * 12 + (cm - lm);
+      if (months <= 0) return;
+
+      const yearsExp = (Date.now() - new Date(emp.doj).getTime()) / (365.25 * 24 * 3600 * 1000);
+      const rate = yearsExp >= 4 ? 2 : 1.5;
+      emp.leaveBalance = emp.leaveBalance || {};
+      emp.leaveBalance.EL = Math.round(((emp.leaveBalance.EL || 0) + rate * months) * 2) / 2;
+      emp.elLastAccrued = currentYM;
+      changed = true;
+    });
+    if (changed) await this.save();
+  },
+
   // ── LEAVE ESCALATION CHECK ────────────────────────────────
-  checkLeaveEscalations() {
+  async checkLeaveEscalations() {
     const today = U.today();
     let changed = false;
     (this.data.leaves||[]).forEach(l => {
@@ -413,25 +533,29 @@ const HR = {
         changed = true;
       }
     });
-    if (changed) this.save();
+    if (changed) await this.save();
   },
 
-  async save() { await Store.save(this.data); },
+  async save() {
+    const ok = await Store.save(this.data);
+    if (!ok) this.toast('Save failed — check connection and try again', 'error');
+    return ok;
+  },
 
   // ── NAVIGATION ────────────────────────────────────────────
   nav(page) {
     if ((page === 'salary' || page === 'payslip') && !this.canSeeSalary()) {
-      this.toast('Access denied — Salary data is restricted to Accounts only', 'error');
+      this.toast('Access denied — Salary data is restricted to Accounts, HR and Admin only', 'error');
       return;
     }
-    if (page === 'settings' && !['HR', 'Admin', 'Accounts'].includes(this.currentUser?.role)) {
+    if (page === 'settings' && !['HR', 'Admin', 'Accounts', 'Management'].includes(this.currentUser?.role)) {
       this.toast('Settings access is restricted', 'error');
       return;
     }
     this.page = page;
     document.querySelectorAll('.nav-link').forEach(l => l.classList.toggle('active', l.dataset.page === page));
     const titles = { dashboard:'Dashboard', employees:'Employee Management', attendance:'Attendance',
-      leaves:'Leave Management', salary:'Salary Configuration', payslip:'Payslip Generator', settings:'Settings' };
+      leaves:'Leave Management', salary:'Salary Configuration', payslip:'Payslip Generator', settings:'Settings', portal:'My Portal' };
     document.getElementById('page-title').textContent = titles[page] || page;
     document.getElementById('content').innerHTML = this['render_' + page] ? this['render_' + page]() : '';
     this['init_' + page] && this['init_' + page]();
@@ -569,7 +693,7 @@ const HR = {
         <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input class="form-control" id="emp-search" placeholder="Search employees…" oninput="HR.filterEmployees()">
       </div>
-      <button class="btn btn-primary" onclick="HR.openEmpForm()">+ Add Employee</button>
+      ${this.isHRAdmin() ? `<button class="btn btn-primary" onclick="HR.openEmpForm()">+ Add Employee</button>` : ''}
     </div>
     <div class="card">
       <div class="card-body" style="padding:0">
@@ -623,12 +747,12 @@ const HR = {
     <form onsubmit="HR.saveEmp(event,'${id||''}')">
       <div class="form-grid">
         <div class="form-section">Personal & Employment Info</div>
-        <div class="form-group"><label>Employee ID *</label><input class="form-control" name="id" value="${v('id')}" required ${emp?'readonly':''}></div>
+        <div class="form-group"><label>Employee ID *</label><input class="form-control" name="id" value="${v('id')}" required ${emp && !this.isHRAdmin() ? 'readonly' : ''}></div>
         <div class="form-group"><label>Full Name *</label><input class="form-control" name="name" value="${v('name')}" required></div>
         <div class="form-group"><label>Designation *</label><input class="form-control" name="designation" value="${v('designation')}" required></div>
         <div class="form-group"><label>Department *</label><input class="form-control" name="department" value="${v('department')}" required></div>
         <div class="form-group"><label>Grade</label><input class="form-control" name="grade" value="${v('grade')}"></div>
-        <div class="form-group"><label>Week Off</label><input class="form-control" name="weekOff" value="${v('weekOff','Sat,Sun')}" placeholder="e.g. Sat,Sun"></div>
+        <div class="form-group"><label>Week Off</label><input class="form-control" name="weekOff" value="${v('weekOff','Sun')}" placeholder="e.g. Sun or Sat,Sun"></div>
         <div class="form-group"><label>Date of Joining</label><input class="form-control" type="date" name="doj" value="${v('doj')}"></div>
         <div class="form-group"><label>Status</label>
           <select class="form-control" name="status">
@@ -678,7 +802,7 @@ const HR = {
       </div>
     </form>`, 'lg');
   },
-  saveEmp(e, existingId) {
+  async saveEmp(e, existingId) {
     e.preventDefault();
     const fd = new FormData(e.target);
     const get = k => fd.get(k) || '';
@@ -695,25 +819,50 @@ const HR = {
       bankName: get('bankName').trim(), ifsc: get('ifsc').trim(), bankAcc: get('bankAcc').trim(),
       managerId: get('managerId') || null,
       salary,
-      leaveBalance: existingId ? (existing?.leaveBalance || this._freshLeaveBalance(null)) : this._freshLeaveBalance(null)
+      leaveBalance: existingId ? (existing?.leaveBalance || this._freshLeaveBalance(null)) : { CL:7, SL:6, EL:0, CO:0 },
+      // New employees start EL accrual from current month, not DOJ, to prevent back-fill
+      elLastAccrued: existingId ? (existing?.elLastAccrued || null) : U.currentYM()
     };
     if (!emp.id) return this.toast('Employee ID is required','error');
+    const idChanged = existingId && emp.id !== existingId;
     if (existingId) {
+      if (idChanged) {
+        if (this.data.employees.find(x => x.id === emp.id)) return this.toast('Employee ID already exists','error');
+        (this.data.attendance||[]).forEach(a  => { if (a.empId  === existingId) a.empId  = emp.id; });
+        (this.data.leaves||[]).forEach(l      => { if (l.empId  === existingId) l.empId  = emp.id; });
+        (this.data.payslips||[]).forEach(ps   => { if (ps.empId === existingId) ps.empId = emp.id; });
+      }
       const idx = this.data.employees.findIndex(x => x.id === existingId);
       if (idx >= 0) this.data.employees[idx] = emp;
     } else {
       if (this.data.employees.find(x => x.id === emp.id)) return this.toast('Employee ID already exists','error');
       this.data.employees.push(emp);
     }
-    this.save();
+    const ok = await this.save();
+    if (!ok) {
+      if (!existingId) {
+        this.data.employees = this.data.employees.filter(x => x.id !== emp.id);
+      } else {
+        const rollbackIdx = this.data.employees.findIndex(x => x.id === emp.id);
+        if (rollbackIdx >= 0 && existing) this.data.employees[rollbackIdx] = existing;
+        if (idChanged) {
+          (this.data.attendance||[]).forEach(a  => { if (a.empId  === emp.id) a.empId  = existingId; });
+          (this.data.leaves||[]).forEach(l      => { if (l.empId  === emp.id) l.empId  = existingId; });
+          (this.data.payslips||[]).forEach(ps   => { if (ps.empId === emp.id) ps.empId = existingId; });
+        }
+      }
+      return;
+    }
     this.closeModal();
     this.nav('employees');
     this.toast(existingId ? 'Employee updated' : 'Employee added');
   },
-  deleteEmp(id) {
+  async deleteEmp(id) {
     if (!confirm('Delete this employee? This cannot be undone.')) return;
+    const backup = [...this.data.employees];
     this.data.employees = this.data.employees.filter(e => e.id !== id);
-    this.save();
+    const ok = await this.save();
+    if (!ok) { this.data.employees = backup; return; }
     this.nav('employees');
     this.toast('Employee deleted', 'info');
   },
@@ -898,9 +1047,20 @@ const HR = {
     set('cnt-a',  `❌ ${a} Absent/LOP`);
   },
 
-  saveAttDay() {
+  async saveAttDay() {
     const date = document.getElementById('att-date-pick')?.value || this._attDate || U.today();
     const activeEmps = this.data.employees.filter(e => e.status === 'active');
+
+    // Snapshot for rollback if save fails
+    const prevAttendance = [...this.data.attendance];
+    const prevBalances = {};
+    activeEmps.forEach(emp => { prevBalances[emp.id] = { ...(emp.leaveBalance || {}) }; });
+
+    // Snapshot which employees had a paid leave recorded on this date before wiping
+    const prevPaidLeave = {};
+    this.data.attendance
+      .filter(a => a.date === date && a.status === 'L' && a.leaveType && !a.isLOP)
+      .forEach(a => { prevPaidLeave[a.empId] = a.leaveType; });
 
     // Remove all existing records for this date first
     this.data.attendance = this.data.attendance.filter(a => a.date !== date);
@@ -916,7 +1076,12 @@ const HR = {
       if (status === 'L' && leaveType) {
         const lt = this.data.leaveTypes.find(t => t.id === leaveType);
         if (!lt?.paid) isLOP = true;
-        else if ((emp.leaveBalance?.[leaveType] || 0) <= 0) isLOP = true;
+        else {
+          // Use prev balance + restoration to check true available balance
+          const prevType = prevPaidLeave[emp.id];
+          const restoredBal = (emp.leaveBalance?.[leaveType] || 0) + (prevType === leaveType ? 1 : 0);
+          if (restoredBal <= 0) isLOP = true;
+        }
       }
 
       const isSundayOT = new Date(date).getDay() === 0 && status === 'P';
@@ -929,18 +1094,32 @@ const HR = {
       });
     });
 
-    // Deduct leave balance for approved paid leaves (Sunday OT resolved separately at month-end)
+    // Adjust leave balances based only on what changed (restore old type, deduct new type)
     activeEmps.forEach(emp => {
       const rec = this.data.attendance.find(a => a.empId === emp.id && a.date === date);
       if (!emp.leaveBalance) emp.leaveBalance = {};
-      if (rec?.status === 'L' && rec.leaveType && !rec.isLOP) {
-        emp.leaveBalance[rec.leaveType] = Math.max(0, (emp.leaveBalance[rec.leaveType] || 0) - 1);
+      const oldType = prevPaidLeave[emp.id] || null;
+      const newType = (rec?.status === 'L' && rec.leaveType && !rec.isLOP) ? rec.leaveType : null;
+      if (oldType && oldType !== newType) {
+        // Restore the previously deducted leave
+        emp.leaveBalance[oldType] = (emp.leaveBalance[oldType] || 0) + 1;
+      }
+      if (newType && newType !== oldType) {
+        // Deduct the newly assigned leave
+        emp.leaveBalance[newType] = Math.max(0, (emp.leaveBalance[newType] || 0) - 1);
       }
     });
 
-    this.save();
-    this.updateAttCounts();
+    const ok = await this.save();
+    if (!ok) {
+      // Rollback all in-memory mutations on save failure
+      this.data.attendance = prevAttendance;
+      activeEmps.forEach(emp => { emp.leaveBalance = prevBalances[emp.id]; });
+      return;
+    }
     this.toast(`Attendance saved for ${U.fmtDate(date)}`);
+    // Re-render the table so leave balance badges reflect the updated values
+    this.switchAttTab('mark');
   },
 
   renderAttHistory() {
@@ -997,14 +1176,22 @@ const HR = {
   },
 
   calcWorkingDays(emp, ym) {
-    // All days except Sundays are working days
     const [y, m] = ym.split('-').map(Number);
     const total = U.daysInMonth(y, m);
-    let sundays = 0;
+    const weekOff = emp?.weekOff || 'Sun';
+    const offDows = new Set(
+      weekOff.split(',').map(d => d.trim() === 'Sat' ? 6 : 0)
+    );
+    const holidaySet = new Set(
+      (this.data.holidays || []).filter(h => h.date && h.date.startsWith(ym)).map(h => h.date)
+    );
+    let count = 0;
     for (let d = 1; d <= total; d++) {
-      if (new Date(y, m - 1, d).getDay() === 0) sundays++;
+      const ds = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const dow = new Date(y, m - 1, d).getDay();
+      if (!offDows.has(dow) && !holidaySet.has(ds)) count++;
     }
-    return total - sundays;
+    return count;
   },
 
   exportAttCSV() {
@@ -1063,6 +1250,7 @@ const HR = {
       <button class="tab-btn ${this._leaveTab==='requests'?'active':''}" onclick="HR.switchLeaveTab('requests')">All Leave Records</button>
       ${showApply ? `<button class="tab-btn ${this._leaveTab==='apply'?'active':''}" onclick="HR.switchLeaveTab('apply')">Record Leave</button>` : ''}
       ${showBalance ? `<button class="tab-btn ${this._leaveTab==='balance'?'active':''}" onclick="HR.switchLeaveTab('balance')">Leave Balance</button>` : ''}
+      <button class="tab-btn ${this._leaveTab==='calendar'?'active':''}" onclick="HR.switchLeaveTab('calendar')">Team Calendar</button>
     </div>
     <div id="leave-tab-content">${this.renderLeaveTab(this._leaveTab)}</div>`;
   },
@@ -1075,7 +1263,8 @@ const HR = {
         (tab==='approvals' && txt.includes('approval')) ||
         (tab==='requests' && txt.includes('all leave')) ||
         (tab==='apply' && txt.includes('record leave')) ||
-        (tab==='balance' && txt.includes('balance'))
+        (tab==='balance' && txt.includes('balance')) ||
+        (tab==='calendar' && txt.includes('calendar'))
       );
     });
     document.getElementById('leave-tab-content').innerHTML = this.renderLeaveTab(tab);
@@ -1085,6 +1274,7 @@ const HR = {
     if (tab === 'apply') return this.renderLeaveApply();
     if (tab === 'requests') return this.renderLeaveRequests();
     if (tab === 'balance') return this.renderLeaveBalance();
+    if (tab === 'calendar') return this.renderLeaveCalendar();
     return '';
   },
   renderLeaveApply() {
@@ -1126,6 +1316,10 @@ const HR = {
               <label>To Date *</label>
               <input class="form-control" type="date" name="to" id="leave-to" value="${today}" required onchange="HR._updateApproverInfo()">
             </div>
+            <div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:24px">
+              <input type="checkbox" name="halfDay" id="leave-halfday" onchange="HR._updateApproverInfo()" style="width:16px;height:16px;cursor:pointer">
+              <label for="leave-halfday" style="margin:0;cursor:pointer;font-weight:500">Half Day (0.5)</label>
+            </div>
             <div class="form-group">
               <label>Approval Routing</label>
               <select class="form-control" name="status">
@@ -1156,11 +1350,17 @@ const HR = {
     const toEl    = document.getElementById('leave-to');
     const box     = document.getElementById('mgr-info-box');
     if (!box || !empSel || !fromEl || !toEl) return;
+    const halfEl = document.getElementById('leave-halfday');
+    const isHalf = halfEl && halfEl.checked;
+    // Disable "to" field when half-day is checked
+    toEl.disabled = isHalf;
+    if (isHalf) toEl.value = fromEl.value;
     const emp  = this.data.employees.find(e => e.id === empSel.value);
     const from = fromEl.value, to = toEl.value;
     let days = 1;
     if (from && to && to >= from) {
-      days = Math.round((new Date(to) - new Date(from)) / 86400000) + 1;
+      const holidays = (this.data.holidays || []).map(h => h.date);
+      days = isHalf ? 0.5 : U.countWorkingDays(from, to, holidays, emp?.weekOff || 'Sun');
     }
     const approver = this._resolveApprover(emp, days);
     const color = days > 2 ? 'var(--primary)' : 'var(--success)';
@@ -1233,7 +1433,7 @@ const HR = {
                 </td>
                 <td style="white-space:nowrap">
                   <button class="btn btn-success btn-sm" onclick="HR.actionLeave('${l.id}','approved')">Approve</button>
-                  <button class="btn btn-danger btn-sm" onclick="HR.actionLeave('${l.id}','rejected')">Reject</button>
+                  <button class="btn btn-danger btn-sm" onclick="HR.promptReject('${l.id}')">Reject</button>
                 </td>
               </tr>`;
             }).join('')}</tbody>
@@ -1242,35 +1442,71 @@ const HR = {
       </div>
     </div>`;
   },
+  promptReject(id) {
+    this.openModal('Reject Leave', `
+    <div class="form-group">
+      <label>Reason for rejection <span style="color:var(--gray-400);font-weight:400">(shown to employee)</span></label>
+      <textarea class="form-control" id="reject-reason-input" rows="3" placeholder="e.g. Short-staffed on these dates, insufficient notice…"></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="HR.closeModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="HR.confirmReject('${id}')">Confirm Rejection</button>
+    </div>`, 'sm');
+  },
+  async confirmReject(id) {
+    const reason = (document.getElementById('reject-reason-input')?.value || '').trim();
+    this.closeModal();
+    const leave = this.data.leaves.find(l => l.id === id);
+    if (!leave) return;
+    leave.rejectionReason = reason;
+    await this.actionLeave(id, 'rejected');
+  },
 
-  submitLeave(e) {
+  async submitLeave(e) {
     e.preventDefault();
     const fd = new FormData(e.target);
-    const from = fd.get('from'), to = fd.get('to');
+    const isHalf = fd.get('halfDay') === 'on';
+    const from = fd.get('from');
+    const to   = isHalf ? from : fd.get('to');
     if (to < from) return this.toast('To date must be after from date', 'error');
 
     const empId = fd.get('empId');
     const emp = this.data.employees.find(x => x.id === empId);
+    const holidays = (this.data.holidays || []).map(h => h.date);
+    const days = isHalf ? 0.5 : U.countWorkingDays(from, to, holidays, emp?.weekOff || 'Sun');
+    if (days <= 0) return this.toast('No working days in the selected range (weekends/holidays excluded)', 'error');
 
-    const msPerDay = 86400000;
-    const days = Math.round((new Date(to) - new Date(from)) / msPerDay) + 1;
-    if (days <= 0) return this.toast('Invalid date range', 'error');
+    // Overlap check — block if employee already has approved/pending leave on any of these dates
+    if (!isHalf) {
+      const wDates = U.workingDates(from, to, holidays, emp?.weekOff || 'Sun');
+      const conflict = (this.data.leaves || []).find(l =>
+        l.empId === empId &&
+        ['approved','pending'].includes(l.status) &&
+        U.workingDates(l.from, l.to, holidays, emp?.weekOff || 'Sun').some(d => wDates.includes(d))
+      );
+      if (conflict) return this.toast(`Leave already exists for these dates (${conflict.status})`, 'error');
+    }
 
     const typeId = fd.get('type');
     const status = fd.get('status') || 'pending';
     const lt     = this.data.leaveTypes.find(t => t.id === typeId);
 
+    // Snapshot for rollback
+    const prevBal        = emp?.leaveBalance?.[typeId] ?? null;
+    const prevAttendance = [...this.data.attendance];
+
     // Deduct balance only if HR directly approves
-    if (status === 'approved' && lt?.paid) {
+    if (status === 'approved' && lt?.paid && typeId !== 'LOP') {
       const bal = emp?.leaveBalance?.[typeId] || 0;
       if (days > bal) return this.toast(`Insufficient balance for ${lt.name}. Available: ${bal} day(s)`, 'error');
       emp.leaveBalance[typeId] = Math.max(0, bal - days);
-      this.markAttendanceForLeave({ empId, type: typeId, from, to, days, reason: fd.get('reason')||'' });
+      this.markAttendanceForLeave({ empId, type: typeId, from, to, days, halfDay: isHalf, reason: fd.get('reason')||'' });
     }
 
     const approver = this._resolveApprover(emp, days);
     const leave = {
       id: U.uid(), empId, type: typeId, from, to, days,
+      halfDay: isHalf || false,
       reason: fd.get('reason')||'',
       recordedBy: fd.get('recordedBy') || this.currentUser?.name || 'HR',
       managerId: emp?.managerId || null,
@@ -1279,7 +1515,13 @@ const HR = {
       appliedOn: U.today()
     };
     this.data.leaves.push(leave);
-    this.save();
+    const ok = await this.save();
+    if (!ok) {
+      this.data.leaves.pop();
+      if (status === 'approved' && emp && prevBal !== null) emp.leaveBalance[typeId] = prevBal;
+      if (status === 'approved') this.data.attendance = prevAttendance;
+      return;
+    }
     e.target.reset();
     if (status === 'approved') {
       this.toast(`Leave approved — ${days} day(s) balance deducted & attendance marked`);
@@ -1290,22 +1532,25 @@ const HR = {
   },
 
   markAttendanceForLeave(leave) {
-    const curr = new Date(leave.from);
-    const end  = new Date(leave.to);
-    const lt   = this.data.leaveTypes.find(t => t.id === leave.type);
-    while (curr <= end) {
-      const dateStr = curr.toISOString().split('T')[0];
+    const lt       = this.data.leaveTypes.find(t => t.id === leave.type);
+    const holidays = (this.data.holidays || []).map(h => h.date);
+    const emp      = this.data.employees.find(e => e.id === leave.empId);
+    // Half-day: only mark the single from date
+    const dates = leave.halfDay
+      ? [leave.from]
+      : U.workingDates(leave.from, leave.to, holidays, emp?.weekOff || 'Sun');
+    dates.forEach(dateStr => {
       this.data.attendance = this.data.attendance.filter(
-        a => !(a.empId === leave.empId && a.date === dateStr)
+        a => !(a.empId === leave.empId && a.date === dateStr && ['L','HD'].includes(a.status))
       );
       this.data.attendance.push({
-        empId: leave.empId, date: dateStr, status: 'L',
+        empId: leave.empId, date: dateStr,
+        status: leave.halfDay ? 'HD' : 'L',
         leaveType: leave.type,
-        notes: `Approved leave: ${leave.reason || leave.type}`,
+        notes: `${leave.halfDay ? 'Half-day' : 'Approved'} leave: ${leave.reason || leave.type}`,
         isLOP: !lt?.paid, isSundayOT: false
       });
-      curr.setDate(curr.getDate() + 1);
-    }
+    });
   },
   renderLeaveRequests() {
     const myTeam = this.isManager() ? this.getMyTeamEmpIds() : null;
@@ -1336,11 +1581,12 @@ const HR = {
                 <td>
                   <span class="badge badge-${statusBadge}">${l.status==='escalated'?'Escalated to HR':l.status}</span>
                   ${l.status==='escalated'&&l.escalatedOn?`<div class="text-sm text-muted">${U.fmtDate(l.escalatedOn)}</div>`:''}
+                  ${l.status==='rejected'&&l.rejectionReason?`<div class="text-sm text-muted" style="margin-top:2px">Reason: ${U.escHtml(l.rejectionReason)}</div>`:''}
                 </td>
                 ${canAction?`<td style="white-space:nowrap">
                   ${(l.status==='pending'||l.status==='escalated')?`
                     <button class="btn btn-success btn-sm" onclick="HR.actionLeave('${l.id}','approved')">Approve</button>
-                    <button class="btn btn-danger btn-sm" onclick="HR.actionLeave('${l.id}','rejected')">Reject</button>
+                    <button class="btn btn-danger btn-sm" onclick="HR.promptReject('${l.id}')">Reject</button>
                   `:l.status==='approved'?`<button class="btn btn-outline btn-sm" onclick="HR.actionLeave('${l.id}','pending')">Revert</button>`:''}
                   ${this.isHRAdmin()?`<button class="btn btn-outline btn-sm" onclick="HR.deleteLeave('${l.id}')">Delete</button>`:''}
                 </td>`:''}
@@ -1351,7 +1597,7 @@ const HR = {
       </div>
     </div>`;
   },
-  actionLeave(id, newStatus) {
+  async actionLeave(id, newStatus) {
     const leave = this.data.leaves.find(l => l.id === id);
     if (!leave) return;
     const oldStatus = leave.status;
@@ -1361,10 +1607,15 @@ const HR = {
     const emp = this.data.employees.find(e => e.id === leave.empId);
     const lt  = this.data.leaveTypes.find(t => t.id === leave.type);
 
-    // Approve: deduct balance + mark attendance
+    // Approve: check balance, deduct, mark attendance
     if (newStatus === 'approved' && oldStatus !== 'approved') {
-      if (emp && lt?.paid) {
-        emp.leaveBalance[leave.type] = Math.max(0, (emp.leaveBalance[leave.type]||0) - leave.days);
+      if (emp && lt?.paid && leave.type !== 'LOP') {
+        const bal = emp.leaveBalance?.[leave.type] || 0;
+        if (leave.days > bal) {
+          leave.status = oldStatus; // rollback
+          return this.toast(`Cannot approve — ${emp.name} has only ${bal} ${lt.name} day(s) available (needs ${leave.days})`, 'error');
+        }
+        emp.leaveBalance[leave.type] = Math.max(0, bal - leave.days);
       }
       this.markAttendanceForLeave(leave);
     }
@@ -1373,19 +1624,30 @@ const HR = {
       if (emp && lt?.paid) {
         emp.leaveBalance[leave.type] = (emp.leaveBalance[leave.type]||0) + leave.days;
       }
-      // Remove attendance records for this leave's dates
-      const curr = new Date(leave.from);
-      const end  = new Date(leave.to);
-      while (curr <= end) {
-        const ds = curr.toISOString().split('T')[0];
+      const holidays = (this.data.holidays || []).map(h => h.date);
+      const revertDates = leave.halfDay
+        ? [leave.from]
+        : U.workingDates(leave.from, leave.to, holidays, emp?.weekOff || 'Sun');
+      revertDates.forEach(ds => {
         this.data.attendance = this.data.attendance.filter(
-          a => !(a.empId === leave.empId && a.date === ds && a.status === 'L' && a.leaveType === leave.type)
+          a => !(a.empId === leave.empId && a.date === ds && ['L','HD'].includes(a.status) && a.leaveType === leave.type)
         );
-        curr.setDate(curr.getDate() + 1);
-      }
+      });
     }
 
-    this.save();
+    const ok = await this.save();
+    if (!ok) {
+      // rollback all in-memory changes
+      leave.status = oldStatus;
+      if (newStatus === 'approved' && oldStatus !== 'approved' && emp && lt?.paid && leave.type !== 'LOP') {
+        emp.leaveBalance[leave.type] = (emp.leaveBalance[leave.type]||0) + leave.days;
+      }
+      if (oldStatus === 'approved' && newStatus !== 'approved') {
+        if (emp && lt?.paid) emp.leaveBalance[leave.type] = Math.max(0, (emp.leaveBalance[leave.type]||0) - leave.days);
+        this.markAttendanceForLeave({ ...leave, status: 'approved' });
+      }
+      return;
+    }
     this.switchLeaveTab(this._leaveTab);
     if (newStatus === 'approved') {
       this.toast(`Leave approved — balance deducted & attendance marked for ${leave.days} day(s)`);
@@ -1395,10 +1657,39 @@ const HR = {
       this.toast(`Leave reverted to pending`);
     }
   },
-  deleteLeave(id) {
+  async deleteLeave(id) {
     if (!confirm('Delete this leave record?')) return;
+    const leave   = this.data.leaves.find(l => l.id === id);
+    if (!leave) return;
+    const emp     = this.data.employees.find(e => e.id === leave.empId);
+    const lt      = this.data.leaveTypes.find(t => t.id === leave.type);
+    const backupLeaves     = [...this.data.leaves];
+    const backupAttendance = [...this.data.attendance];
+    const backupBal        = emp ? { ...emp.leaveBalance } : null;
+
+    // If approved, restore balance and remove attendance marks
+    if (leave.status === 'approved') {
+      if (emp && lt?.paid && leave.type !== 'LOP') {
+        emp.leaveBalance = emp.leaveBalance || {};
+        emp.leaveBalance[leave.type] = (emp.leaveBalance[leave.type] || 0) + leave.days;
+      }
+      const holidays = (this.data.holidays || []).map(h => h.date);
+      const dates = leave.halfDay ? [leave.from] : U.workingDates(leave.from, leave.to, holidays, emp?.weekOff || 'Sun');
+      dates.forEach(ds => {
+        this.data.attendance = this.data.attendance.filter(
+          a => !(a.empId === leave.empId && a.date === ds && ['L','HD'].includes(a.status) && a.leaveType === leave.type)
+        );
+      });
+    }
+
     this.data.leaves = this.data.leaves.filter(l => l.id !== id);
-    this.save();
+    const ok = await this.save();
+    if (!ok) {
+      this.data.leaves     = backupLeaves;
+      this.data.attendance = backupAttendance;
+      if (emp && backupBal) emp.leaveBalance = backupBal;
+      return;
+    }
     this.switchLeaveTab('requests');
     this.toast('Deleted','info');
   },
@@ -1411,7 +1702,10 @@ const HR = {
       <strong>2 days/month (24/yr)</strong> for ≥4 yrs tenure
     </div>
     <div class="card">
-      <div class="card-head"><h3>Leave Balance — Current Year</h3></div>
+      <div class="card-head">
+        <h3>Leave Balance — Current Year</h3>
+        <button class="btn btn-outline btn-sm" onclick="HR.openGrantCO()">+ Grant Comp Off</button>
+      </div>
       <div class="card-body" style="padding:0">
         <div class="table-wrap">
           <table class="table">
@@ -1464,18 +1758,397 @@ const HR = {
       </div>
     </form>`, 'sm');
   },
-  saveLeaveBalance(e, empId) {
+  async saveLeaveBalance(e, empId) {
     e.preventDefault();
     const emp = this.data.employees.find(x => x.id === empId);
     if (!emp) return;
     const fd = new FormData(e.target);
+    const prev = { ...emp.leaveBalance };
     if (!emp.leaveBalance) emp.leaveBalance = {};
     this.data.leaveTypes.filter(t=>t.paid).forEach(t => {
       emp.leaveBalance[t.id] = +fd.get(t.id)||0;
     });
-    this.save(); this.closeModal();
+    const ok = await this.save();
+    if (!ok) { emp.leaveBalance = prev; return; }
+    this.closeModal();
     this.switchLeaveTab('balance');
     this.toast('Leave balance updated');
+  },
+  _calendarYM: null,
+  renderLeaveCalendar() {
+    const ym = this._calendarYM || U.currentYM();
+    const [y, m] = ym.split('-').map(Number);
+    const daysInMonth = new Date(y, m, 0).getDate();
+    const firstDow    = new Date(y, m - 1, 1).getDay(); // 0=Sun
+    const holidays    = new Set((this.data.holidays||[]).map(h=>h.date));
+    const activeEmps  = this.data.employees.filter(e => e.status === 'active');
+
+    // Build leave map: date -> [{empName, type, status, halfDay}]
+    const leaveMap = {};
+    (this.data.leaves||[]).filter(l => l.status === 'approved').forEach(l => {
+      const emp = this.data.employees.find(e => e.id === l.empId);
+      if (!emp) return;
+      const lt  = this.data.leaveTypes.find(t => t.id === l.type);
+      const color = lt?.color || 'var(--primary)';
+      const cur = new Date(l.from);
+      const end = new Date(l.to);
+      while (cur <= end) {
+        const ds = cur.toISOString().split('T')[0];
+        if (ds.startsWith(ym)) {
+          if (!leaveMap[ds]) leaveMap[ds] = [];
+          leaveMap[ds].push({ name: emp.name, color, halfDay: l.halfDay });
+        }
+        cur.setDate(cur.getDate() + 1);
+      }
+    });
+
+    const prevYM = () => {
+      const d = new Date(y, m - 2, 1);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    };
+    const nextYM = () => {
+      const d = new Date(y, m, 1);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    };
+
+    let cells = '';
+    // Empty cells before first day
+    for (let i = 0; i < firstDow; i++) cells += `<div class="cal-cell cal-empty"></div>`;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const ds  = `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const dow = new Date(y, m-1, d).getDay();
+      const isWkd = dow === 0;
+      const isHol = holidays.has(ds);
+      const leaves = leaveMap[ds] || [];
+      const today  = U.today() === ds;
+      cells += `<div class="cal-cell${isWkd?' cal-weekend':''}${isHol?' cal-holiday':''}${today?' cal-today':''}">
+        <div class="cal-day">${d}${isHol?`<span class="cal-hol-dot" title="${(this.data.holidays||[]).find(h=>h.date===ds)?.name||'Holiday'}">●</span>`:''}</div>
+        ${leaves.map(l=>`<div class="cal-emp-dot" style="background:${l.color}" title="${U.escHtml(l.name)}${l.halfDay?' (½)':''}">${U.escHtml(l.name.split(' ')[0])}</div>`).join('')}
+      </div>`;
+    }
+
+    return `
+    <div class="card">
+      <div class="card-head" style="align-items:center">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="btn btn-outline btn-sm" onclick="HR._calendarYM='${prevYM()}';HR.switchLeaveTab('calendar')">‹ Prev</button>
+          <h3 style="margin:0">${U.fmtMonthYear(ym)}</h3>
+          <button class="btn btn-outline btn-sm" onclick="HR._calendarYM='${nextYM()}';HR.switchLeaveTab('calendar')">Next ›</button>
+        </div>
+        <div style="font-size:12px;color:var(--gray-500)">${activeEmps.length} active employees</div>
+      </div>
+      <div class="card-body">
+        <div class="cal-grid">
+          ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="cal-hdr">${d}</div>`).join('')}
+          ${cells}
+        </div>
+        <div style="margin-top:12px;display:flex;gap:16px;flex-wrap:wrap;font-size:12px">
+          ${(this.data.leaveTypes||[]).filter(t=>t.paid).map(t=>`
+            <span style="display:flex;align-items:center;gap:4px">
+              <span style="width:10px;height:10px;border-radius:3px;background:${t.color||'#888'};display:inline-block"></span>${t.name}
+            </span>`).join('')}
+          <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:3px;background:var(--danger);opacity:.4;display:inline-block"></span>Holiday</span>
+        </div>
+      </div>
+    </div>`;
+  },
+
+  openGrantCO() {
+    const activeEmps = this.data.employees.filter(e => e.status === 'active');
+    this.openModal('Grant Comp Off', `
+    <div class="alert alert-info" style="margin-bottom:12px;font-size:13px">
+      Use this when an employee works on a Sunday or public holiday.
+      1 worked day = 1 CO credit (0.5 for half-day).
+    </div>
+    <form onsubmit="HR.saveGrantCO(event)">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Employee *</label>
+          <select class="form-control" name="empId" required>
+            ${activeEmps.map(e=>`<option value="${e.id}">${U.escHtml(e.name)} (${e.id})</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>CO Days to Grant *</label>
+          <select class="form-control" name="coDays" required>
+            <option value="1">1 day (full day worked)</option>
+            <option value="0.5">0.5 day (half day worked)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Date Worked *</label>
+          <input class="form-control" type="date" name="workedDate" value="${U.today()}" required>
+        </div>
+        <div class="form-group">
+          <label>Reason</label>
+          <input class="form-control" name="reason" placeholder="e.g. Worked on Republic Day">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" onclick="HR.closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Grant CO</button>
+      </div>
+    </form>`, 'sm');
+  },
+  async saveGrantCO(e) {
+    e.preventDefault();
+    const fd     = new FormData(e.target);
+    const empId  = fd.get('empId');
+    const days   = parseFloat(fd.get('coDays'));
+    const emp    = this.data.employees.find(x => x.id === empId);
+    if (!emp) return;
+    emp.leaveBalance = emp.leaveBalance || {};
+    emp.leaveBalance.CO = Math.round(((emp.leaveBalance.CO || 0) + days) * 2) / 2;
+    const ok = await this.save();
+    if (!ok) { emp.leaveBalance.CO -= days; return; }
+    this.closeModal();
+    this.switchLeaveTab('balance');
+    this.toast(`${days} Comp Off day(s) granted to ${emp.name}`);
+  },
+
+  // ============================================================
+  // EMPLOYEE SELF-SERVICE PORTAL
+  // ============================================================
+  _portalTab: 'apply',
+  render_portal() {
+    const empId = this.currentUser?.empId;
+    const emp   = this.data.employees.find(e => e.id === empId);
+    if (!emp) return `<div class="empty-state"><p>Employee record not found</p></div>`;
+    const paidTypes = this.data.leaveTypes.filter(t => t.paid);
+    const tenure = emp.doj ? (Date.now() - new Date(emp.doj).getTime()) / (365.25*24*3600*1000) : null;
+    const onProbation = tenure !== null && tenure < 0.25; // < 3 months
+    return `
+    <div class="tabs">
+      <button class="tab-btn ${this._portalTab==='apply'?'active':''}" onclick="HR.switchPortalTab('apply')">Apply Leave</button>
+      <button class="tab-btn ${this._portalTab==='history'?'active':''}" onclick="HR.switchPortalTab('history')">My Leaves</button>
+      <button class="tab-btn ${this._portalTab==='balance'?'active':''}" onclick="HR.switchPortalTab('balance')">My Balance</button>
+    </div>
+    <div id="portal-tab-content">${this._renderPortalTab(this._portalTab, emp, paidTypes, onProbation)}</div>`;
+  },
+  init_portal() {},
+  switchPortalTab(tab) {
+    this._portalTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      const t = b.textContent.toLowerCase();
+      b.classList.toggle('active',
+        (tab==='apply' && t.includes('apply')) ||
+        (tab==='history' && t.includes('my leaves')) ||
+        (tab==='balance' && t.includes('balance'))
+      );
+    });
+    const empId = this.currentUser?.empId;
+    const emp   = this.data.employees.find(e => e.id === empId);
+    const paidTypes = this.data.leaveTypes.filter(t => t.paid);
+    const tenure = emp?.doj ? (Date.now() - new Date(emp.doj).getTime()) / (365.25*24*3600*1000) : null;
+    const onProbation = tenure !== null && tenure < 0.25;
+    document.getElementById('portal-tab-content').innerHTML = this._renderPortalTab(tab, emp, paidTypes, onProbation);
+  },
+  _renderPortalTab(tab, emp, paidTypes, onProbation) {
+    if (tab === 'apply')   return this._renderPortalApply(emp, paidTypes, onProbation);
+    if (tab === 'history') return this._renderPortalHistory(emp);
+    if (tab === 'balance') return this._renderPortalBalance(emp, paidTypes);
+    return '';
+  },
+  _renderPortalApply(emp, paidTypes, onProbation) {
+    const today = U.today();
+    const holidays = (this.data.holidays || []).map(h => h.date);
+    const availTypes = paidTypes.filter(t => !(onProbation && t.id === 'EL'));
+    const unpaidTypes = this.data.leaveTypes.filter(t => !t.paid);
+    const allTypes = [...availTypes, ...unpaidTypes];
+    return `<div class="card">
+      <div class="card-head">
+        <h3>Apply for Leave</h3>
+        ${onProbation ? '<span class="badge badge-warning">On Probation — EL not available</span>' : ''}
+      </div>
+      <div class="card-body">
+        <form onsubmit="HR.submitOwnLeave(event)">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Leave Type *</label>
+              <select class="form-control" name="type" required onchange="HR._portalCheckBalance(this)">
+                ${allTypes.map(t=>`<option value="${t.id}">${t.name}${t.paid?'':' (Unpaid/LOP)'}</option>`).join('')}
+              </select>
+            </div>
+            <div class="form-group" style="display:flex;align-items:center;gap:8px;padding-top:24px">
+              <input type="checkbox" name="halfDay" id="portal-halfday" onchange="HR._portalUpdateDays()" style="width:16px;height:16px;cursor:pointer">
+              <label for="portal-halfday" style="margin:0;cursor:pointer;font-weight:500">Half Day (0.5)</label>
+            </div>
+            <div class="form-group">
+              <label>From Date *</label>
+              <input class="form-control" type="date" name="from" id="portal-from" value="${today}" min="${today}" required onchange="HR._portalUpdateDays()">
+            </div>
+            <div class="form-group">
+              <label>To Date *</label>
+              <input class="form-control" type="date" name="to" id="portal-to" value="${today}" min="${today}" required onchange="HR._portalUpdateDays()">
+            </div>
+            <div class="form-group span-2">
+              <label>Reason *</label>
+              <textarea class="form-control" name="reason" rows="2" placeholder="Brief reason for leave…" required></textarea>
+            </div>
+          </div>
+          <div id="portal-days-info" style="margin-bottom:12px"></div>
+          <div id="portal-balance-info" style="margin-bottom:12px"></div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Submit Request</button>
+          </div>
+        </form>
+      </div>
+    </div>`;
+  },
+  _portalUpdateDays() {
+    const fromEl  = document.getElementById('portal-from');
+    const toEl    = document.getElementById('portal-to');
+    const halfEl  = document.getElementById('portal-halfday');
+    const isHalf  = halfEl && halfEl.checked;
+    const box     = document.getElementById('portal-days-info');
+    if (!fromEl || !toEl) return;
+    // Disable "to" when half-day
+    toEl.disabled = isHalf;
+    if (isHalf) toEl.value = fromEl.value;
+    const from = fromEl.value, to = toEl.value;
+    if (!box || !from) return;
+    const emp     = this.data.employees.find(e => e.id === this.currentUser?.empId);
+    const holidays= (this.data.holidays||[]).map(h=>h.date);
+    const days    = isHalf ? 0.5 : U.countWorkingDays(from, to, holidays, emp?.weekOff||'Sun');
+    if (days <= 0) {
+      box.innerHTML = `<div class="alert alert-warning">No working days in this range — weekends and holidays are excluded.</div>`;
+    } else {
+      box.innerHTML = `<div class="alert alert-info"><strong>${days} working day(s)</strong> selected${isHalf?' (half day)':''}.</div>`;
+    }
+  },
+  _portalCheckBalance(sel) {
+    const box = document.getElementById('portal-balance-info');
+    if (!box) return;
+    const emp = this.data.employees.find(e => e.id === this.currentUser?.empId);
+    const lt  = this.data.leaveTypes.find(t => t.id === sel.value);
+    if (!lt?.paid || !emp) { box.innerHTML = ''; return; }
+    const bal = emp.leaveBalance?.[lt.id] ?? 0;
+    box.innerHTML = `<div class="alert alert-${bal>0?'info':'warning'}">Current <strong>${lt.name}</strong> balance: <strong>${bal} day(s)</strong></div>`;
+  },
+  async submitOwnLeave(e) {
+    e.preventDefault();
+    const fd     = new FormData(e.target);
+    const empId  = this.currentUser?.empId;
+    const emp    = this.data.employees.find(x => x.id === empId);
+    const isHalf = fd.get('halfDay') === 'on';
+    const from   = fd.get('from');
+    const to     = isHalf ? from : fd.get('to');
+    if (to < from) return this.toast('To date must be after from date', 'error');
+    const holidays = (this.data.holidays||[]).map(h=>h.date);
+    const days     = isHalf ? 0.5 : U.countWorkingDays(from, to, holidays, emp?.weekOff||'Sun');
+    if (days <= 0) return this.toast('No working days in the selected range', 'error');
+    const typeId = fd.get('type');
+    const lt     = this.data.leaveTypes.find(t => t.id === typeId);
+    // Check balance upfront
+    if (lt?.paid && typeId !== 'LOP') {
+      const bal = emp?.leaveBalance?.[typeId] ?? 0;
+      if (days > bal) return this.toast(`Insufficient balance — ${lt.name}: ${bal} day(s) available`, 'error');
+    }
+    // Probation: block EL
+    const tenure = emp?.doj ? (Date.now()-new Date(emp.doj).getTime())/(365.25*24*3600*1000) : null;
+    if (typeId === 'EL' && tenure !== null && tenure < 0.25) {
+      return this.toast('EL is not available during probation (first 3 months)', 'error');
+    }
+    // Overlap check
+    if (!isHalf) {
+      const wDates   = U.workingDates(from, to, holidays, emp?.weekOff||'Sun');
+      const conflict = (this.data.leaves||[]).find(l =>
+        l.empId === empId && ['approved','pending'].includes(l.status) &&
+        U.workingDates(l.from, l.to, holidays, emp?.weekOff||'Sun').some(d => wDates.includes(d))
+      );
+      if (conflict) return this.toast(`You already have a ${conflict.status} leave on these dates`, 'error');
+    }
+    const approver = this._resolveApprover(emp, days);
+    const leave = {
+      id: U.uid(), empId, type: typeId, from, to, days,
+      halfDay: isHalf || false,
+      reason: fd.get('reason')||'',
+      recordedBy: emp.name,
+      managerId: emp?.managerId || null,
+      approverId: approver?.id || null,
+      status: 'pending',
+      appliedOn: U.today()
+    };
+    this.data.leaves.push(leave);
+    const ok = await this.save();
+    if (!ok) { this.data.leaves.pop(); return; }
+    e.target.reset();
+    this.toast(`Leave request submitted — sent to ${approver ? approver.name : 'HR'} for approval`);
+    this.switchPortalTab('history');
+  },
+  _renderPortalHistory(emp) {
+    const myLeaves = [...(this.data.leaves||[])]
+      .filter(l => l.empId === emp.id)
+      .sort((a,b) => b.appliedOn > a.appliedOn ? 1 : -1);
+    if (!myLeaves.length) return `<div class="card"><div class="card-body"><div class="empty-state"><p>No leave records yet</p></div></div></div>`;
+    const today = U.today();
+    return `<div class="card">
+      <div class="card-body" style="padding:0">
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Reason</th><th>Applied</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody>${myLeaves.map(l => {
+              const lt = this.data.leaveTypes.find(t => t.id === l.type);
+              const statusBadge = l.status==='approved'?'success':l.status==='rejected'?'danger':l.status==='escalated'?'danger':'warning';
+              const canCancel = l.status === 'pending' && l.from >= today;
+              return `<tr>
+                <td><span class="badge badge-info">${lt?.name||l.type}</span>${l.halfDay?'<br><span class="text-sm text-muted">Half day</span>':''}</td>
+                <td>${U.fmtDate(l.from)}</td>
+                <td>${l.halfDay ? '—' : U.fmtDate(l.to)}</td>
+                <td><strong>${l.days}</strong></td>
+                <td>${U.escHtml(l.reason||'—')}</td>
+                <td>${U.fmtDate(l.appliedOn)}</td>
+                <td>
+                  <span class="badge badge-${statusBadge}">${l.status==='escalated'?'Escalated':l.status}</span>
+                  ${l.status==='rejected'&&l.rejectionReason?`<div class="text-sm text-muted" style="margin-top:2px">Reason: ${U.escHtml(l.rejectionReason)}</div>`:''}
+                </td>
+                <td>${canCancel ? `<button class="btn btn-outline btn-sm" onclick="HR.cancelOwnLeave('${l.id}')">Cancel</button>` : '—'}</td>
+              </tr>`;
+            }).join('')}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+  },
+  async cancelOwnLeave(id) {
+    if (!confirm('Cancel this leave request?')) return;
+    const leave = this.data.leaves.find(l => l.id === id);
+    if (!leave || leave.status !== 'pending') return this.toast('Only pending leaves can be cancelled', 'error');
+    const backup = leave.status;
+    leave.status = 'cancelled';
+    const ok = await this.save();
+    if (!ok) { leave.status = backup; return; }
+    this.toast('Leave request cancelled', 'info');
+    this.switchPortalTab('history');
+  },
+  _renderPortalBalance(emp, paidTypes) {
+    const tenure = emp.doj ? (Date.now()-new Date(emp.doj).getTime())/(365.25*24*3600*1000) : null;
+    const tenureStr = tenure !== null ? (tenure>=1?`${Math.floor(tenure)}y ${Math.floor((tenure%1)*12)}m`:`${Math.floor(tenure*12)}m`) : '—';
+    const onProbation = tenure !== null && tenure < 0.25;
+    return `
+    ${onProbation ? `<div class="alert alert-warning" style="margin-bottom:16px">You are currently on probation (< 3 months). EL accrual begins after confirmation.</div>` : ''}
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:24px">
+      ${paidTypes.map(t => {
+        const bal = emp.leaveBalance?.[t.id] ?? 0;
+        const color = t.color || 'var(--primary)';
+        return `<div class="card" style="border-top:3px solid ${color}">
+          <div class="card-body" style="text-align:center;padding:16px">
+            <div style="font-size:28px;font-weight:700;color:${color}">${bal}</div>
+            <div style="font-size:13px;font-weight:600;margin:4px 0">${t.name}</div>
+            <div class="text-muted text-sm">${t.id === 'EL' ? 'Accrues monthly' : `${t.annual} days/year`}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <div style="font-size:13px;color:var(--gray-600)">
+          <strong>Employee:</strong> ${U.escHtml(emp.name)} (${emp.id}) &nbsp;·&nbsp;
+          <strong>DOJ:</strong> ${emp.doj ? U.fmtDate(emp.doj) : '—'} &nbsp;·&nbsp;
+          <strong>Tenure:</strong> ${tenureStr}
+        </div>
+      </div>
+    </div>`;
   },
 
   // ============================================================
@@ -1488,7 +2161,7 @@ const HR = {
       <button class="btn btn-outline" onclick="HR.nav('employees')">Manage Employees</button>
     </div>
     <div class="salary-grid">
-      ${this.data.employees.map(emp => {
+      ${this.data.employees.filter(e => e.status === 'active').map(emp => {
         const s = emp.salary||{};
         const gross = (s.basic||0)+(s.hra||0)+(s.prodIncentive||0);
         const epfAmt = s.epf ? Math.round((s.basic||0)*s.epfRate/100) : 0;
@@ -1583,7 +2256,7 @@ const HR = {
     </div>`;
   },
   init_payslip() {},
-  generatePayslip() {
+  async generatePayslip() {
     const empId = document.getElementById('ps-emp')?.value || this._psState.empId;
     const ym    = document.getElementById('ps-month')?.value || this._psState.ym;
     if (!empId || !ym) return this.toast('Select employee and month', 'error');
@@ -1655,9 +2328,11 @@ const HR = {
       generatedOn: U.today()
     };
 
+    const prevPayslips = [...this.data.payslips];
     this.data.payslips = this.data.payslips.filter(p => !(p.empId===empId && p.ym===ym));
     this.data.payslips.push(ps);
-    this.save();
+    const ok = await this.save();
+    if (!ok) { this.data.payslips = prevPayslips; return; }
 
     this.showPayslipPreview(ps);
     this.toast('Payslip generated successfully!');
@@ -1701,17 +2376,21 @@ const HR = {
     window.print();
     printArea.style.display = 'none';
   },
-  deletePayslip(id) {
+  async deletePayslip(id) {
     if (!confirm('Delete this payslip?')) return;
+    const backup = [...this.data.payslips];
     this.data.payslips = this.data.payslips.filter(p => p.id !== id);
-    this.save(); this.nav('payslip');
+    const ok = await this.save();
+    if (!ok) { this.data.payslips = backup; return; }
+    this.nav('payslip');
     this.toast('Payslip deleted','info');
   },
 
-  generateAllPayslips() {
+  async generateAllPayslips() {
     const ym = document.getElementById('ps-month')?.value || this._psState.ym || U.currentYM();
     const active = this.data.employees.filter(e => e.status === 'active');
     let count = 0;
+    const prevPayslips = [...this.data.payslips];
     active.forEach(emp => {
       this._psState = { empId: emp.id, ym };
       // Temporarily set values so generatePayslip reads them correctly
@@ -1749,7 +2428,8 @@ const HR = {
       this.data.payslips.push(ps);
       count++;
     });
-    this.save();
+    const ok = await this.save();
+    if (!ok) { this.data.payslips = prevPayslips; return; }
     this.nav('payslip');
     this.toast(`Payslips generated for ${count} employee(s) — ${U.fmtMonthYear(ym)}`);
   },
@@ -2108,6 +2788,21 @@ const HR = {
       </div>
 
       <div class="card">
+        <div class="card-head"><h3>Year-End Leave Processing</h3></div>
+        <div class="card-body">
+          <div class="alert alert-warning" style="margin-bottom:12px;font-size:13px">
+            <strong>Run this once at the start of each leave year (Jan 1 or Apr 1).</strong><br>
+            CL and SL are reset to full entitlement. EL is carried forward as-is (earned leave never expires).
+            CO balances are cleared. A backup is recommended before running.
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="HR.runYearEndReset()">Run Year-End Reset</button>
+            <span class="text-muted text-sm">Last run: <span id="year-end-last">${this.data._yearEndLastRun ? U.fmtDate(this.data._yearEndLastRun) : 'Never'}</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
         <div class="card-head"><h3>Data Management</h3></div>
         <div class="card-body">
           <div style="display:flex;flex-direction:column;gap:10px">
@@ -2123,11 +2818,13 @@ const HR = {
     </div>`;
   },
   init_settings() {},
-  saveCompany(e) {
+  async saveCompany(e) {
     e.preventDefault();
     const fd = new FormData(e.target);
+    const prev = { ...this.data.company };
     this.data.company = { name: fd.get('name'), address: fd.get('address'), phone: fd.get('phone'), email: fd.get('email') };
-    this.save();
+    const ok = await this.save();
+    if (!ok) { this.data.company = prev; return; }
     document.getElementById('sidebar-company').textContent = this.data.company.name.split(' ').slice(0,2).join(' ');
     this.toast('Company info saved');
   },
@@ -2159,20 +2856,25 @@ const HR = {
       </div>
     </form>`, 'sm');
   },
-  addLeaveType(e) {
+  async addLeaveType(e) {
     e.preventDefault();
     const fd = new FormData(e.target);
     const id = fd.get('id').toUpperCase().trim();
     if (this.data.leaveTypes.find(t => t.id === id)) return this.toast('Code already exists','error');
-    this.data.leaveTypes.push({ id, name: fd.get('name'), annual: +fd.get('annual'), paid: fd.get('paid')==='1', color: '#64748B' });
-    this.save(); this.closeModal();
+    const lt = { id, name: fd.get('name'), annual: +fd.get('annual'), paid: fd.get('paid')==='1', color: '#64748B' };
+    this.data.leaveTypes.push(lt);
+    const ok = await this.save();
+    if (!ok) { this.data.leaveTypes.pop(); return; }
+    this.closeModal();
     document.getElementById('lt-tbody').innerHTML = this.leaveTypeRows();
     this.toast('Leave type added');
   },
-  deleteLeaveType(id) {
+  async deleteLeaveType(id) {
     if (!confirm('Delete this leave type?')) return;
+    const backup = [...this.data.leaveTypes];
     this.data.leaveTypes = this.data.leaveTypes.filter(t => t.id !== id);
-    this.save();
+    const ok = await this.save();
+    if (!ok) { this.data.leaveTypes = backup; return; }
     document.getElementById('lt-tbody').innerHTML = this.leaveTypeRows();
     this.toast('Deleted','info');
   },
@@ -2196,19 +2898,23 @@ const HR = {
       </div>
     </form>`, 'sm');
   },
-  addHoliday(e) {
+  async addHoliday(e) {
     e.preventDefault();
     const fd = new FormData(e.target);
     const date = fd.get('date'), name = fd.get('name');
     if (this.data.holidays.find(h => h.date === date)) return this.toast('Holiday already exists for this date','error');
     this.data.holidays.push({ date, name });
-    this.save(); this.closeModal();
+    const ok = await this.save();
+    if (!ok) { this.data.holidays.pop(); return; }
+    this.closeModal();
     document.getElementById('holiday-list').innerHTML = this.holidayItems();
     this.toast('Holiday added');
   },
-  deleteHoliday(date) {
+  async deleteHoliday(date) {
+    const backup = [...this.data.holidays];
     this.data.holidays = this.data.holidays.filter(h => h.date !== date);
-    this.save();
+    const ok = await this.save();
+    if (!ok) { this.data.holidays = backup; return; }
     document.getElementById('holiday-list').innerHTML = this.holidayItems();
     this.toast('Deleted','info');
   },
@@ -2282,7 +2988,7 @@ const HR = {
     </div>`;
   },
 
-  resolveSundayOT(empId, ym, type) {
+  async resolveSundayOT(empId, ym, type) {
     const emp = this.data.employees.find(e => e.id === empId);
     if (!emp) return;
 
@@ -2296,20 +3002,28 @@ const HR = {
 
     if (!emp.leaveBalance) emp.leaveBalance = {};
 
+    let msg = '';
     if (type === 'leave') {
       emp.leaveBalance.CO = (emp.leaveBalance.CO || 0) + count;
-      this.toast(`+${count} Comp Off added to ${emp.name}'s leave balance`);
+      msg = `+${count} Comp Off added to ${emp.name}'s leave balance`;
     } else {
-      // Encash: store pending encashment; picked up during payslip generation
       if (!emp.pendingSundayOTEncash) emp.pendingSundayOTEncash = {};
       emp.pendingSundayOTEncash[ym] = (emp.pendingSundayOTEncash[ym] || 0) + count;
       const s = emp.salary || {};
       const wd = this.calcWorkingDays(emp, ym);
       const dailyRate = wd > 0 ? Math.round(((s.basic||0) + (s.hra||0)) / wd) : 0;
-      this.toast(`₹${U.fmtINR(dailyRate * count)} Sunday OT encashment recorded for ${emp.name} — will appear in payslip`);
+      msg = `₹${U.fmtINR(dailyRate * count)} Sunday OT encashment recorded for ${emp.name} — will appear in payslip`;
     }
 
-    this.save();
+    const ok = await this.save();
+    if (!ok) {
+      // rollback
+      sunRecs.forEach(r => { r.sundayOTResolved = null; });
+      if (type === 'leave') emp.leaveBalance.CO -= count;
+      else if (emp.pendingSundayOTEncash) emp.pendingSundayOTEncash[ym] = (emp.pendingSundayOTEncash[ym] || 0) - count;
+      return;
+    }
+    this.toast(msg);
     // Refresh the section
     const el = document.getElementById('sunday-ot-section');
     if (el) el.innerHTML = this.renderSundayOTSection(ym);
@@ -2344,7 +3058,7 @@ const HR = {
             <option value="COO"${u?.role==='COO'?' selected':''}>COO (Approves leaves ≤2 days)</option>
             <option value="CBO"${u?.role==='CBO'?' selected':''}>CBO (Approves leaves ≤2 days)</option>
             <option value="Manager"${u?.role==='Manager'?' selected':''}>Manager (Approves leaves ≤2 days)</option>
-            <option value="Management"${u?.role==='Management'?' selected':''}>Management (View only)</option>
+            <option value="Management"${u?.role==='Management'?' selected':''}>Management (Full HR access, no salary)</option>
           </select></div>
         <div class="form-group"><label>Email Address</label>
           <input class="form-control" name="email" type="email"
@@ -2361,39 +3075,70 @@ const HR = {
     </form>`, 'sm');
   },
 
-  saveAdminUser(e, id) {
+  async saveAdminUser(e, id) {
     e.preventDefault();
     const fd = new FormData(e.target);
     const email   = (fd.get('email') || '').trim().toLowerCase();
     const newPass = (fd.get('password') || '').trim();
     if (!this.data.adminUsers) this.data.adminUsers = [];
+    let prevSnapshot = null;
     if (id) {
       const u = this.data.adminUsers.find(x => x.id === id);
       if (u) {
+        prevSnapshot = { ...u };
         u.name  = fd.get('name');
         u.role  = fd.get('role');
         u.email = email;
         if (newPass) u.password = newPass;
       }
     } else {
-      this.data.adminUsers.push({
-        id: U.uid(), name: fd.get('name'), role: fd.get('role'), email,
-        password: newPass || 'Snl@1234'
-      });
+      const newUser = { id: U.uid(), name: fd.get('name'), role: fd.get('role'), email, password: newPass || 'Snl@1234' };
+      this.data.adminUsers.push(newUser);
     }
-    this.save(); this.closeModal();
+    const ok = await this.save();
+    if (!ok) {
+      if (id && prevSnapshot) {
+        const u = this.data.adminUsers.find(x => x.id === id);
+        if (u) Object.assign(u, prevSnapshot);
+      } else {
+        this.data.adminUsers.pop();
+      }
+      return;
+    }
+    this.closeModal();
     document.getElementById('admin-users-tbody').innerHTML = this.adminUserRows();
     this.toast('Admin user saved');
   },
 
-  deleteAdminUser(id) {
+  async deleteAdminUser(id) {
     if (!confirm('Remove this admin user?')) return;
-    this.data.adminUsers = (this.data.adminUsers || []).filter(u => u.id !== id);
-    this.save();
+    const backup = [...(this.data.adminUsers || [])];
+    this.data.adminUsers = backup.filter(u => u.id !== id);
+    const ok = await this.save();
+    if (!ok) { this.data.adminUsers = backup; return; }
     document.getElementById('admin-users-tbody').innerHTML = this.adminUserRows();
     this.toast('Deleted','info');
   },
 
+  async runYearEndReset() {
+    if (!confirm('Run year-end leave reset?\n\nThis will:\n• Reset CL → 7 days for all active employees\n• Reset SL → 6 days for all active employees\n• Keep EL as-is (carried forward)\n• Clear CO balance\n\nA data export is recommended first. Continue?')) return;
+    let count = 0;
+    (this.data.employees || []).forEach(emp => {
+      if (emp.status !== 'active') return;
+      emp.leaveBalance = emp.leaveBalance || {};
+      emp.leaveBalance.CL = 7;
+      emp.leaveBalance.SL = 6;
+      emp.leaveBalance.CO = 0;
+      // EL intentionally not reset — it carries forward
+      count++;
+    });
+    this.data._yearEndLastRun = U.today();
+    const ok = await this.save();
+    if (!ok) return;
+    const el = document.getElementById('year-end-last');
+    if (el) el.textContent = U.fmtDate(this.data._yearEndLastRun);
+    this.toast(`Year-end reset complete — ${count} employees updated`, 'info');
+  },
   exportData() {
     const blob = new Blob([JSON.stringify(this.data, null, 2)], {type:'application/json'});
     const a = document.createElement('a');
@@ -2412,8 +3157,7 @@ const HR = {
         if (!imported.employees) throw new Error('Invalid format');
         if (!confirm('This will replace all current data. Continue?')) return;
         this.data = { ...Store.defaults(), ...imported };
-        this.save(); this.nav('dashboard');
-        this.toast('Data imported successfully');
+        this.save().then(() => { this.nav('dashboard'); this.toast('Data imported successfully'); });
       } catch(err) { this.toast('Invalid JSON file','error'); }
     };
     reader.readAsText(file);
@@ -2422,8 +3166,7 @@ const HR = {
     if (!confirm('⚠ This will delete ALL data permanently. Are you sure?')) return;
     if (!confirm('Last chance – this cannot be undone. Reset everything?')) return;
     this.data = Store.defaults();
-    this.save(); this.nav('dashboard');
-    this.toast('All data reset','info');
+    this.save().then(() => { this.nav('dashboard'); this.toast('All data reset','info'); });
   }
 };
 
